@@ -1,7 +1,4 @@
 
-
-
-
 import os
 import numpy as np
 from keras.layers import Concatenate, Dot, Input, LSTM, RepeatVector, Dense
@@ -19,8 +16,8 @@ TRAIN_DATA = np.load('../data/inputs_weather_train.npy')
 TRAIN_LABELS = np.load("../data/yield_train.npy")
 dir_ = 'results'
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"  #gpu_number=2
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "2"  #gpu_number=2
+# os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
 os.environ["KERAS_BACKEND"] = "tensorflow"
  
 # import tensorflow as tf
@@ -137,16 +134,16 @@ prob_model.set_weights(pred_model.get_weights())
 loss = hist.history['loss']
 val_loss = hist.history['val_loss']
 
-plt.figure()
-plt.plot(loss)
-plt.plot(val_loss)
-plt.title('Model Loss')
-plt.ylabel('Loss')
-plt.xlabel('Epoch')
-plt.legend(['Training Set', 'Validation Set'], loc='upper right')
-plt.savefig('%s/loss_plot.png'%(dir_))
-print("Saved loss plot to disk") 
-plt.close()
+# plt.figure()
+# plt.plot(loss)
+# plt.plot(val_loss)
+# plt.title('Model Loss')
+# plt.ylabel('Loss')
+# plt.xlabel('Epoch')
+# plt.legend(['Training Set', 'Validation Set'], loc='upper right')
+# plt.savefig('%s/loss_plot.png'%(dir_))
+# print("Saved loss plot to disk") 
+# plt.close()
 
 # Save Data
 loss = pd.DataFrame(loss).to_csv('%s/loss.csv'%(dir_))    # Not in original scale 
