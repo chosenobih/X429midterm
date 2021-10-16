@@ -17,7 +17,7 @@ TRAIN_LABELS = np.load("../data/yield_train.npy")
 dir_ = 'results'
 
 # os.environ["CUDA_VISIBLE_DEVICES"] = "2"  #gpu_number=2
-# os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
 os.environ["KERAS_BACKEND"] = "tensorflow"
  
 # import tensorflow as tf
@@ -28,7 +28,7 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 # K.set_session(sess)
 
 h_s = 128   # {32, 64, 96, 128, 256}
-dropout = 0.2  
+dropout = 0.23  
 batch_size = 512  
 epochs = 5   # 100
 lr_rate = 0.001   # (0.001, 3e-4, 5e-4)
