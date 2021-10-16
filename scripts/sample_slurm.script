@@ -6,21 +6,6 @@
 #SBATCH --partition=standard
 #SBATCH --ntasks=1
 #SBATCH --time=24:10:00
-<<<<<<< HEAD
-
-#SBATCH --cpus-per-task=4
-
-#SBATCH --gres=gpu:1
-
-# other common options. 
-### means they are commented out
-###SBATCH --account=PI
-###SBATCH --partition=windfall
-###SBATCH --gres=gpu:1
-###SBATCH --cpus-per-task=4 
-###SBATCH --mem-per-cpu=5gb
-###SBATCH —-mem=1600gb
-=======
 #SBATCH --account=lyons-lab
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=128GB
@@ -34,7 +19,7 @@
 ###SBATCH --partition=windfall
 ###SBATCH --gres=gpu:1
 ###SBATCH --cpus-per-task=4 
->>>>>>> fdec0ce8bc2ad8f483cb445bdf370d0ff57a340e
+
 ###SBATCH --mail-type=ALL
 ###SBATCH --mail-user=netid@email.arizona.edu
 

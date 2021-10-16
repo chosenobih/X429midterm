@@ -1,10 +1,4 @@
-
-<<<<<<< HEAD
-import os
-import numpy as np
-=======
 import os, logging, csv, numpy as np, matplotlib.pyplot as plt, pandas as pd
->>>>>>> fdec0ce8bc2ad8f483cb445bdf370d0ff57a340e
 from keras.layers import Concatenate, Dot, Input, LSTM, RepeatVector, Dense
 from keras.layers import Dropout, Flatten, Reshape, Activation
 from keras.models import Model
@@ -36,7 +30,7 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 h_s = 128   # {32, 64, 96, 128, 256}
 dropout = 0.2  
 batch_size = 512  
-epochs = 1   # 100
+epochs = 100   # 100
 lr_rate = 0.001   # (0.001, 3e-4, 5e-4)
 con_dim = 2   # (1, 2, 4, 8, 16) # Reduction in dimension of the temporal context to con_dim before concat with MG, Cluster
 
@@ -141,21 +135,6 @@ pred_model.save('recent_model')
 prob_model.set_weights(pred_model.get_weights())
 
 # Plot
-<<<<<<< HEAD
-loss = hist.history['loss']
-val_loss = hist.history['val_loss']
-
-# plt.figure()
-# plt.plot(loss)
-# plt.plot(val_loss)
-# plt.title('Model Loss')
-# plt.ylabel('Loss')
-# plt.xlabel('Epoch')
-# plt.legend(['Training Set', 'Validation Set'], loc='upper right')
-# plt.savefig('%s/loss_plot.png'%(dir_))
-# print("Saved loss plot to disk") 
-# plt.close()
-=======
 loss = hist.history['loss'][1:]
 val_loss = hist.history['val_loss'][1:]
 
@@ -172,7 +151,6 @@ def plot_loss(loss,val_loss):
     logging.info("Saved loss plot to disk")
     plt.close()
 
->>>>>>> fdec0ce8bc2ad8f483cb445bdf370d0ff57a340e
 
 # Save Data
 loss = pd.DataFrame(loss).to_csv('%s/loss.csv'%(dir_))    # Not in original scale 
