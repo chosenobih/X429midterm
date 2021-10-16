@@ -132,3 +132,4 @@ dmypy.json
 
 data/
 recent_model/
+.vscode/
