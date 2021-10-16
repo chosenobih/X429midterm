@@ -1,20 +1,26 @@
 
+<<<<<<< HEAD
 import os
 import numpy as np
+=======
+import os, logging, csv, numpy as np, matplotlib.pyplot as plt, pandas as pd
+>>>>>>> fdec0ce8bc2ad8f483cb445bdf370d0ff57a340e
 from keras.layers import Concatenate, Dot, Input, LSTM, RepeatVector, Dense
 from keras.layers import Dropout, Flatten, Reshape, Activation
 from keras.models import Model
+from keras.callbacks import EarlyStopping
 from keras.activations import softmax
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
+from keras.optimizers import Adam
 from math import sqrt
-import matplotlib.pyplot as plt
-import csv
-import pandas as pd
+
+logging.basicConfig(filename='../logs/model_train.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
 
 TRAIN_DATA = np.load('../data/inputs_weather_train.npy') 
 TRAIN_LABELS = np.load("../data/yield_train.npy")
-dir_ = 'results'
+dir_ = '../results'
 
 # os.environ["CUDA_VISIBLE_DEVICES"] = "2"  #gpu_number=2
 # os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
@@ -30,7 +36,7 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 h_s = 128   # {32, 64, 96, 128, 256}
 dropout = 0.2  
 batch_size = 512  
-epochs = 5   # 100
+epochs = 1   # 100
 lr_rate = 0.001   # (0.001, 3e-4, 5e-4)
 con_dim = 2   # (1, 2, 4, 8, 16) # Reduction in dimension of the temporal context to con_dim before concat with MG, Cluster
 
@@ -49,6 +55,8 @@ scaler_y = scaler_y.fit(yield_train_reshaped)
 
 TRAIN_DATA_SCALED = scaler_x.transform(x_train_reshaped).reshape(TRAIN_DATA.shape)
 TRAIN_LABELS_SCALED = scaler_y.transform(yield_train_reshaped)
+
+X_train, X_validation, y_train, y_validation = train_test_split(TRAIN_DATA_SCALED,TRAIN_LABELS_SCALED, test_size = 0.333)
 
 
 # Model
@@ -111,19 +119,21 @@ def model(Tx, var_ts, h_s, dropout):
 
 
 # Model Summary
-pred_model, prob_model = model(Tx = 214, var_ts = TRAIN_DATA_SCALED.shape[2], h_s = h_s, dropout = dropout)
+pred_model, prob_model = model(Tx = 214, var_ts = X_train.shape[2], h_s = h_s, dropout = dropout)
 pred_model.summary()
-    
-# Train Model
-pred_model.compile(loss='mean_squared_error', optimizer = "Adam") 
+callback_lists = [EarlyStopping(monitor = 'val_loss', patience=3)]
 
-hist = pred_model.fit (TRAIN_DATA_SCALED, TRAIN_LABELS_SCALED,
+# Train Model
+pred_model.compile(loss='mean_squared_error', optimizer = Adam(lr_rate)) 
+
+
+hist = pred_model.fit (X_train, y_train,
                   batch_size = batch_size,
                   epochs = epochs,
                   #callbacks = callback_lists,   # Try Early Stopping
                   verbose = 1,
                   shuffle = True,
-                  validation_split=0.4)
+                  validation_split=0.25)
 
 pred_model.save('recent_model')
 
@@ -131,6 +141,7 @@ pred_model.save('recent_model')
 prob_model.set_weights(pred_model.get_weights())
 
 # Plot
+<<<<<<< HEAD
 loss = hist.history['loss']
 val_loss = hist.history['val_loss']
 
@@ -144,44 +155,65 @@ val_loss = hist.history['val_loss']
 # plt.savefig('%s/loss_plot.png'%(dir_))
 # print("Saved loss plot to disk") 
 # plt.close()
+=======
+loss = hist.history['loss'][1:]
+val_loss = hist.history['val_loss'][1:]
+
+
+def plot_loss(loss,val_loss):
+    fig,ax = plt.subplots()
+    ax.plot(loss)
+    ax.plot(val_loss)
+    fig.suptitle('Model Loss')
+    ax.set_ylabel('Loss')
+    ax.set_xlabel('Epoch')
+    ax.legend(['Training Set', 'Validation Set'], loc='upper right')
+    fig.savefig('%s/loss_plot.png'%(dir_))
+    logging.info("Saved loss plot to disk")
+    plt.close()
+
+>>>>>>> fdec0ce8bc2ad8f483cb445bdf370d0ff57a340e
 
 # Save Data
 loss = pd.DataFrame(loss).to_csv('%s/loss.csv'%(dir_))    # Not in original scale 
 val_loss = pd.DataFrame(val_loss).to_csv('%s/val_loss.csv'%(dir_))  # Not in original scale
+# plot_loss(loss,val_loss)
+
+
 
 # Plot Ground Truth, Model Prediction
 def actual_pred_plot (y_actual, y_pred, n_samples = 60):
     
     # Shape of y_actual, y_pred: (10337, 1)
-    plt.figure()
-    plt.plot(y_actual[ : n_samples])  # 60 examples
-    plt.plot(y_pred[ : n_samples])    # 60 examples
-    plt.legend(['Ground Truth', 'Model Prediction'], loc='upper right')
-    plt.savefig('%s/actual_pred_plot.png'%(dir_))
-    print("Saved actual vs pred plot to disk")
+    fig, ax = plt.subplots()
+    ax.plot(y_actual[ : n_samples])  # n_samples examples
+    ax.plot(y_pred[ : n_samples])    # n_samples examples
+    ax.legend(['Ground Truth', 'Model Prediction'], loc='upper right')
+    fig.savefig('%s/actual_pred_plot.png'%(dir_))
+    logging.info("Saved actual vs pred plot to disk")
     plt.close()
 
 # Correlation Scatter Plot
 def scatter_plot (y_actual, y_pred):
     
     # Shape of y_actual, y_pred: (10337, 1)
-    plt.figure()
-    plt.scatter(y_actual[:], y_pred[:])
-    plt.plot([y_actual.min(), y_actual.max()], [y_actual.min(), y_actual.max()], 'k--', lw=4)
-    plt.title('Predicted Value Vs Actual Value')
-    plt.ylabel('Predicted')
-    plt.xlabel('Actual')
+    fig, ax = plt.subplots()
+    ax.scatter(y_actual[:], y_pred[:])
+    ax.plot([y_actual.min(), y_actual.max()], [y_actual.min(), y_actual.max()], 'k--', lw=4)
+    fig.suptitle('Predicted Value Vs Actual Value')
+    ax.set_ylabel('Predicted')
+    ax.set_xlabel('Actual')
     #textstr = 'r2_score=  %.3f' %(r2_score(y_actual, y_pred))
     #plt.text(250, 450, textstr, horizontalalignment='center', verticalalignment='top', multialignment='center')
-    plt.savefig('%s/scatter_plot.png'%(dir_))
-    print("Saved scatter plot to disk")
+    fig.savefig('%s/scatter_plot.png'%(dir_))
+    logging.info("Saved scatter plot to disk")
     plt.close()
 
 
 
 
  # Evaluate Model
-def evaluate_model (x_data, yield_data, y_data, states_data, dataset):
+def evaluate_model (x_data, yield_data, dataset):
     
     # TRAIN_DATA: (82692, 30, 9), TRAIN_DATA_mg_cluster: (82692, 2), TRAIN_LABELS: (82692, 1), y_train: (82692, 6)
     yield_data_hat = pred_model.predict(x_data, batch_size = batch_size)
@@ -193,36 +225,29 @@ def evaluate_model (x_data, yield_data, y_data, states_data, dataset):
     
     data_rmse = sqrt(mean_squared_error(yield_data, yield_data_hat))
     metric_dict ['rmse'] = data_rmse 
-    print('%s RMSE: %.3f' %(dataset, data_rmse))
+    logging.info('%s RMSE: %.3f' %(dataset, data_rmse))
     
     data_mae = mean_absolute_error(yield_data, yield_data_hat)
     metric_dict ['mae'] = data_mae
-    print('%s MAE: %.3f' %(dataset, data_mae))
+    logging.info('%s MAE: %.3f' %(dataset, data_mae))
     
     data_r2score = r2_score(yield_data, yield_data_hat)
     metric_dict ['r2_score'] = data_r2score
-    print('%s r2_score: %.3f' %(dataset, data_r2score))
+    logging.info('%s r2_score: %.3f' %(dataset, data_r2score))
+
+
+    #make plots
+    actual_pred_plot(yield_data, yield_data_hat, n_samples = 69)
+    scatter_plot(yield_data, yield_data_hat)
     
-    # Save data
-    y_data = np.append(y_data, yield_data_hat, axis = 1)   # (10336, 7)
-    np.save("%s/y_%s" %(dir_, dataset), y_data)
-    
-    # Save States Data
-    with open('%s/states_%s.csv' %(dir_, dataset), 'w', newline="") as csv_file:  
-        wr = csv.writer(csv_file)
-        wr.writerow(states_data)
        
     # Save metrics
     with open('%s/metrics_%s.csv' %(dir_, dataset), 'w', newline="") as csv_file:  
         writer = csv.writer(csv_file)
         for key, value in metric_dict.items():
-            writer.writerow([key, value])
-    
-    # Save Actual Vs Predicted Plot and Scatter PLot for test set
-    if dataset == 'test':
-        actual_pred_plot (yield_data, yield_data_hat)
-        scatter_plot (yield_data, yield_data_hat)
+            writer.writerow([key, value])    
         
     return metric_dict
 
 
+evaluate_model(X_validation,y_validation,'Evaluation')
