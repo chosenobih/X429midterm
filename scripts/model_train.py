@@ -13,6 +13,8 @@ from math import sqrt
 logging.basicConfig(filename='../logs/model_train.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
 
 TRAIN_DATA = np.load('../data/inputs_weather_train.npy') 
+#you need to add the other data somehow - this will boost the score by a decent amount
+
 TRAIN_LABELS = np.load("../data/yield_train.npy")
 dir_ = '../results'
 
@@ -27,10 +29,10 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 # from keras import backend as K
 # K.set_session(sess)
 
-h_s = 128   # {32, 64, 96, 128, 256}
+h_s =256   # {32, 64, 96, 128, 256}
 dropout = 0.2  
 batch_size = 512  
-epochs = 100   # 100
+epochs = 50   # 100
 lr_rate = 0.001   # (0.001, 3e-4, 5e-4)
 con_dim = 2   # (1, 2, 4, 8, 16) # Reduction in dimension of the temporal context to con_dim before concat with MG, Cluster
 
@@ -85,7 +87,7 @@ def model(Tx, var_ts, h_s, dropout):
     encoder_input = Input(shape = (Tx, var_ts))   # (None, 30, 7)
     
     # Lists to store attention weights
-    alphas_list = list()
+    alphas_list = []
     
     # Encoder LSTM, Pre-attention        
     lstm_1, state_h, state_c = LSTM(h_s, return_state=True, return_sequences=True)(encoder_input)
@@ -124,7 +126,7 @@ pred_model.compile(loss='mean_squared_error', optimizer = Adam(lr_rate))
 hist = pred_model.fit (X_train, y_train,
                   batch_size = batch_size,
                   epochs = epochs,
-                  #callbacks = callback_lists,   # Try Early Stopping
+                  callbacks = callback_lists,
                   verbose = 1,
                   shuffle = True,
                   validation_split=0.25)
@@ -135,8 +137,8 @@ pred_model.save('recent_model')
 prob_model.set_weights(pred_model.get_weights())
 
 # Plot
-loss = hist.history['loss'][1:]
-val_loss = hist.history['val_loss'][1:]
+loss = hist.history['loss']
+val_loss = hist.history['val_loss']
 
 
 def plot_loss(loss,val_loss):
