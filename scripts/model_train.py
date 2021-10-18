@@ -26,7 +26,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
 os.environ["KERAS_BACKEND"] = "tensorflow"
  
 h_s =256   # {32, 64, 96, 128, 256}
-dropout = 0.2  
+dropout = 0.4  
 batch_size = 512  
 epochs = 50   # 100
 lr_rate = 0.001   # (0.001, 3e-4, 5e-4)
