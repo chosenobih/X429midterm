@@ -1,13 +1,13 @@
 #!/bin/bash
 
 #SBATCH --job-name=teamxmidtermtraining
-#SBATCH -e test.e%A
-#SBATCH -o test.o%A
+#SBATCH -e ../logs/model_train_errors.e%A
+#SBATCH -o ../logs/model_train_output.o%A
 #SBATCH --partition=standard
 #SBATCH --ntasks=1
 #SBATCH --time=3:00:00
 #SBATCH --account=lyons-lab
-#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=64gb
 #SBATCH --mem=256GB
 #SBATCH --gres=gpu:1
 #SBATCH --mail-type=ALL
@@ -15,8 +15,8 @@
 
 
 # other common options. 
+###SBATCH --cpus-per-task=1
 ### means they are commented out
-###SBATCH --mem-per-cpu=5gb
 ###SBATCH --partition=windfall
 ###SBATCH --gres=gpu:1
 ###SBATCH --cpus-per-task=4 
