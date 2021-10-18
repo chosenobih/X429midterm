@@ -7,23 +7,10 @@
 #SBATCH --ntasks=1
 #SBATCH --time=5:00:00
 #SBATCH --account=lyons-lab
-#SBATCH --mem-per-cpu=64gb
-#SBATCH --mem=256GB
-#SBATCH --gres=gpu:1
+#SBATCH --mem=64GB
+#SBATCH --gres=gpu:pascal:1
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ryanpapetti@email.arizona.edu
-
-
-# other common options. 
-###SBATCH --cpus-per-task=1
-### means they are commented out
-###SBATCH --partition=windfall
-###SBATCH --gres=gpu:1
-###SBATCH --cpus-per-task=4 
-
-###SBATCH --mail-type=ALL
-###SBATCH --mail-user=netid@email.arizona.edu
-
 
 echo 'This script is running on:'
 hostname
