@@ -7,7 +7,7 @@
 #SBATCH --ntasks=1
 #SBATCH --time=5:00:00
 #SBATCH --account=lyons-lab
-#SBATCH --mem=64GB
+#SBATCH --mem=256GB
 #SBATCH --gres=gpu:pascal:1
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ryanpapetti@email.arizona.edu
