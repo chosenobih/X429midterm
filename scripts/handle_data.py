@@ -2,7 +2,7 @@ from typing import final
 import numpy as np, pandas as pd
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.model_selection import train_test_split
-import joblib, os
+import joblib
 
 
 def load_data(weather_path,other_path, cluster_id_path, yield_path):
@@ -14,12 +14,12 @@ def clean_other_data(other_data,cluster_id_data):
     other_df = pd.DataFrame(other_data[:,[0,1]])
     other_df.columns = ['Maturity Group', 'Genotype ID']
     for col in other_df.columns:
-        other_df[col] = other_df[col].astype(float).astype(int)
+        other_df[col] = other_df[col].astype(np.float32).astype(int)
     other_df['Genotype ID'] -= 1 #to match indexing for cluster_id_data
     cluster_id_mapper = lambda genotype_id: cluster_id_data[genotype_id]
     other_df['Genotype ID'] = other_df['Genotype ID'].apply(cluster_id_mapper)
     #now one hot encode all data 
-    return OneHotEncoder().fit_transform(other_df)
+    return OneHotEncoder().fit_transform(other_df).toarray().astype('float32')
 
 
 
@@ -63,8 +63,9 @@ def combine_weather_other_data(scaled_weather_data, other_data_1he, data_path = 
     new_array = []
     for ind,sub_matrix in enumerate(scaled_weather_data):
         other_data_sub = other_data_1he[ind]
-        broadcasted_other = np.broadcast_to(other_data_sub,(sub_matrix.shape[0],other_data_sub.shape[1]))
+        broadcasted_other = np.broadcast_to(other_data_sub,(sub_matrix.shape[0],other_data_sub.shape[0]))
         new = np.column_stack((sub_matrix,broadcasted_other))
+        new = new.astype(np.float32)
         new_array.append(new)
     final_array = np.array(new_array)
     assert final_array.shape == desired_arr_shape

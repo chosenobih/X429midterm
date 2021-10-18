@@ -12,7 +12,7 @@ logging.basicConfig(filename='../logs/model_train.log', level=logging.DEBUG, for
 
 allow_pickle_flag = True
 
-TRAIN_DATA = np.load('../data/combined_data_train.npy', allow_pickle=allow_pickle_flag) 
+TRAIN_DATA = np.load('../data/combined_data_train.npy', allow_pickle=allow_pickle_flag)
 TRAIN_LABELS = np.load("../data/scaled_yield_train.npy", allow_pickle=allow_pickle_flag)
 dir_ = '../results'
 YIELD_SCALER = joblib.load(dir_ + '/yield_scaler.sav')
