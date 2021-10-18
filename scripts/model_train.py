@@ -10,13 +10,15 @@ from math import sqrt
 
 logging.basicConfig(filename='../logs/model_train.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
 
-TRAIN_DATA = np.load('../data/combined_data_train.npy') 
-TRAIN_LABELS = np.load("../data/scaled_yield_train.npy")
+allow_pickle_flag = True
+
+TRAIN_DATA = np.load('../data/combined_data_train.npy', allow_pickle=allow_pickle_flag) 
+TRAIN_LABELS = np.load("../data/scaled_yield_train.npy", allow_pickle=allow_pickle_flag)
 dir_ = '../results'
 YIELD_SCALER = joblib.load(dir_ + '/yield_scaler.sav')
 
-VALIDATION_DATA = np.load('../data/combined_data_validation.npy') 
-VALIDATION_LABELS = np.load("../data/scaled_yield_validation.npy")
+VALIDATION_DATA = np.load('../data/combined_data_validation.npy', allow_pickle=allow_pickle_flag) 
+VALIDATION_LABELS = np.load("../data/scaled_yield_validation.npy", allow_pickle=allow_pickle_flag)
 
 
 # os.environ["CUDA_VISIBLE_DEVICES"] = "2"  #gpu_number=2
