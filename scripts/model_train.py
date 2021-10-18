@@ -22,7 +22,7 @@ VALIDATION_LABELS = np.load("../data/scaled_yield_validation.npy", allow_pickle=
 
 
 # os.environ["CUDA_VISIBLE_DEVICES"] = "2"  #gpu_number=2
-# os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
 os.environ["KERAS_BACKEND"] = "tensorflow"
  
 # import tensorflow as tf
@@ -32,8 +32,13 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 # from keras import backend as K
 # K.set_session(sess)
 
+<<<<<<< HEAD
 h_s =256   # {32, 64, 96, 128, 256}
 dropout = 0.2  
+=======
+h_s = 128   # {32, 64, 96, 128, 256}
+dropout = 0.23  
+>>>>>>> 120131cab142e3ab7de2ed98792de5eb50e09c9f
 batch_size = 512  
 epochs = 50   # 100
 lr_rate = 0.001   # (0.001, 3e-4, 5e-4)
