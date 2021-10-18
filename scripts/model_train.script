@@ -5,7 +5,7 @@
 #SBATCH -o ../logs/model_train_output.o%A
 #SBATCH --partition=standard
 #SBATCH --ntasks=64
-#SBATCH --time=5:00:00
+#SBATCH --time=3:00:00
 #SBATCH --account=lyons-lab
 #SBATCH --mem=256GB
 #SBATCH --gres=gpu:pascal:1
