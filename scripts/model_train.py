@@ -1,22 +1,23 @@
-import os, logging, csv, numpy as np, matplotlib.pyplot as plt, pandas as pd
-from keras.layers import Concatenate, Dot, Input, LSTM, RepeatVector, Dense
-from keras.layers import Dropout, Flatten, Reshape, Activation
+import os, logging, joblib, csv, numpy as np, matplotlib.pyplot as plt, pandas as pd
+from keras.layers import Concatenate, Dot, Input, LSTM, Dense
+from keras.layers import Dropout, Flatten, Activation
 from keras.models import Model
 from keras.callbacks import EarlyStopping
 from keras.activations import softmax
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import train_test_split
 from keras.optimizers import Adam
 from math import sqrt
 
 logging.basicConfig(filename='../logs/model_train.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
 
-TRAIN_DATA = np.load('../data/inputs_weather_train.npy') 
-#you need to add the other data somehow - this will boost the score by a decent amount
-
-TRAIN_LABELS = np.load("../data/yield_train.npy")
+TRAIN_DATA = np.load('../data/combined_data_train.npy') 
+TRAIN_LABELS = np.load("../data/scaled_yield_train.npy")
 dir_ = '../results'
+YIELD_SCALER = joblib.load(dir_ + '/yield_scaler.sav')
+
+VALIDATION_DATA = np.load('../data/combined_data_validation.npy') 
+VALIDATION_LABELS = np.load("../data/scaled_yield_validation.npy")
+
 
 # os.environ["CUDA_VISIBLE_DEVICES"] = "2"  #gpu_number=2
 # os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
@@ -35,24 +36,6 @@ batch_size = 512
 epochs = 50   # 100
 lr_rate = 0.001   # (0.001, 3e-4, 5e-4)
 con_dim = 2   # (1, 2, 4, 8, 16) # Reduction in dimension of the temporal context to con_dim before concat with MG, Cluster
-
-
-scaler_x = MinMaxScaler(feature_range=(-1, 1))
-scaler_y =  MinMaxScaler(feature_range=(-1, 1))
-
-x_train_reshaped = TRAIN_DATA.reshape((TRAIN_DATA.shape[0], TRAIN_DATA.shape[1] * TRAIN_DATA.shape[2]))
-
-yield_train_reshaped = TRAIN_LABELS.reshape((TRAIN_LABELS.shape[0], 1))   # (82692, 1)
-
-# Scaling Coefficients calculated from the training dataset
-scaler_x = scaler_x.fit(x_train_reshaped)   
-scaler_y = scaler_y.fit(yield_train_reshaped)
-
-
-TRAIN_DATA_SCALED = scaler_x.transform(x_train_reshaped).reshape(TRAIN_DATA.shape)
-TRAIN_LABELS_SCALED = scaler_y.transform(yield_train_reshaped)
-
-X_train, X_validation, y_train, y_validation = train_test_split(TRAIN_DATA_SCALED,TRAIN_LABELS_SCALED, test_size = 0.333)
 
 
 # Model
@@ -115,7 +98,7 @@ def model(Tx, var_ts, h_s, dropout):
 
 
 # Model Summary
-pred_model, prob_model = model(Tx = 214, var_ts = X_train.shape[2], h_s = h_s, dropout = dropout)
+pred_model, prob_model = model(Tx = 214, var_ts = TRAIN_DATA.shape[2], h_s = h_s, dropout = dropout)
 pred_model.summary()
 callback_lists = [EarlyStopping(monitor = 'val_loss', patience=3)]
 
@@ -123,13 +106,13 @@ callback_lists = [EarlyStopping(monitor = 'val_loss', patience=3)]
 pred_model.compile(loss='mean_squared_error', optimizer = Adam(lr_rate)) 
 
 
-hist = pred_model.fit (X_train, y_train,
+hist = pred_model.fit (TRAIN_DATA, TRAIN_LABELS,
                   batch_size = batch_size,
                   epochs = epochs,
                   callbacks = callback_lists,
                   verbose = 1,
                   shuffle = True,
-                  validation_split=0.25)
+                  validation_data=(VALIDATION_DATA,VALIDATION_LABELS))
 
 pred_model.save('recent_model')
 
@@ -195,11 +178,10 @@ def scatter_plot (y_actual, y_pred):
  # Evaluate Model
 def evaluate_model (x_data, yield_data, dataset):
     
-    # TRAIN_DATA: (82692, 30, 9), TRAIN_DATA_mg_cluster: (82692, 2), TRAIN_LABELS: (82692, 1), y_train: (82692, 6)
     yield_data_hat = pred_model.predict(x_data, batch_size = batch_size)
-    yield_data_hat = scaler_y.inverse_transform(yield_data_hat)
+    yield_data_hat = YIELD_SCALER.inverse_transform(yield_data_hat)
     
-    yield_data = scaler_y.inverse_transform(yield_data)
+    yield_data = YIELD_SCALER.inverse_transform(yield_data)
     
     metric_dict = {}  # Dictionary to save the metrics
     
@@ -230,4 +212,4 @@ def evaluate_model (x_data, yield_data, dataset):
     return metric_dict
 
 
-evaluate_model(X_validation,y_validation,'Evaluation')
+evaluate_model(VALIDATION_DATA,VALIDATION_LABELS,'Evaluation')
