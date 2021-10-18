@@ -1,4 +1,5 @@
 import os, logging, joblib, csv, numpy as np, matplotlib.pyplot as plt, pandas as pd
+from typing import Dict, Tuple
 from keras.layers import Concatenate, Dot, Input, LSTM, Dense
 from keras.layers import Dropout, Flatten, Activation
 from keras.models import Model
@@ -14,24 +15,16 @@ allow_pickle_flag = True
 
 TRAIN_DATA = np.load('../data/combined_data_train.npy', allow_pickle=allow_pickle_flag)
 TRAIN_LABELS = np.load("../data/scaled_yield_train.npy", allow_pickle=allow_pickle_flag)
-dir_ = '../results'
-YIELD_SCALER = joblib.load(dir_ + '/yield_scaler.sav')
+results_dir = '../results'
+YIELD_SCALER = joblib.load(results_dir + '/yield_scaler.sav')
 
 VALIDATION_DATA = np.load('../data/combined_data_validation.npy', allow_pickle=allow_pickle_flag) 
 VALIDATION_LABELS = np.load("../data/scaled_yield_validation.npy", allow_pickle=allow_pickle_flag)
 
 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "2"  #gpu_number=2
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
 os.environ["KERAS_BACKEND"] = "tensorflow"
  
-# import tensorflow as tf
-# config = tf.ConfigProto()
-# config.gpu_options.allow_growth = True
-# sess = tf.Session(config=config)
-# from keras import backend as K
-# K.set_session(sess)
-
 h_s =256   # {32, 64, 96, 128, 256}
 dropout = 0.2  
 batch_size = 512  
@@ -64,7 +57,18 @@ def temporal_one_step_attention(a):
 
 
 
-def model(Tx, var_ts, h_s, dropout):
+def model(Tx: int, var_ts: int, h_s: int, dropout: float) -> Tuple:
+    """[summary]
+
+    Args:
+        Tx (int): [description]
+        var_ts (int): [description]
+        h_s (int): [description]
+        dropout (float): [description]
+
+    Returns:
+        Tuple: [description]
+    """    
 
     # Tx : Number of input timesteps
     # var_ts: Number of input variables
@@ -116,7 +120,7 @@ hist = pred_model.fit (TRAIN_DATA, TRAIN_LABELS,
                   shuffle = True,
                   validation_data=(VALIDATION_DATA,VALIDATION_LABELS))
 
-pred_model.save('recent_model')
+pred_model.save(f'{results_dir}/recent_model')
 
 # Attention Weights Model
 prob_model.set_weights(pred_model.get_weights())
@@ -126,7 +130,13 @@ loss = hist.history['loss']
 val_loss = hist.history['val_loss']
 
 
-def plot_loss(loss,val_loss):
+def plot_loss(loss: np.ndarray, val_loss: np.ndarray):
+    """[summary]
+
+    Args:
+        loss (np.ndarray): [description]
+        val_loss (np.ndarray): [description]
+    """    
     fig,ax = plt.subplots()
     ax.plot(loss)
     ax.plot(val_loss)
@@ -134,33 +144,44 @@ def plot_loss(loss,val_loss):
     ax.set_ylabel('Loss')
     ax.set_xlabel('Epoch')
     ax.legend(['Training Set', 'Validation Set'], loc='upper right')
-    fig.savefig('%s/loss_plot.png'%(dir_))
+    fig.savefig('%s/loss_plot.png'%(results_dir))
     logging.info("Saved loss plot to disk")
     plt.close()
 
 
 # Save Data
-loss = pd.DataFrame(loss).to_csv('%s/loss.csv'%(dir_))    # Not in original scale 
-val_loss = pd.DataFrame(val_loss).to_csv('%s/val_loss.csv'%(dir_))  # Not in original scale
+loss = pd.DataFrame(loss).to_csv('%s/loss.csv'%(results_dir))    # Not in original scale 
+val_loss = pd.DataFrame(val_loss).to_csv('%s/val_loss.csv'%(results_dir))  # Not in original scale
 # plot_loss(loss,val_loss)
 
 
 
 # Plot Ground Truth, Model Prediction
-def actual_pred_plot (y_actual, y_pred, n_samples = 60):
-    
+def actual_pred_plot (y_actual: np.ndarray, y_pred: np.ndarray, n_samples: int = 60):
+    """[summary]
+
+    Args:
+        y_actual (np.ndarray): [description]
+        y_pred (np.ndarray): [description]
+        n_samples (int, optional): [description]. Defaults to 60.
+    """    
     # Shape of y_actual, y_pred: (10337, 1)
     fig, ax = plt.subplots()
     ax.plot(y_actual[ : n_samples])  # n_samples examples
     ax.plot(y_pred[ : n_samples])    # n_samples examples
     ax.legend(['Ground Truth', 'Model Prediction'], loc='upper right')
-    fig.savefig('%s/actual_pred_plot.png'%(dir_))
+    fig.savefig('%s/actual_pred_plot.png'%(results_dir))
     logging.info("Saved actual vs pred plot to disk")
     plt.close()
 
 # Correlation Scatter Plot
-def scatter_plot (y_actual, y_pred):
-    
+def scatter_plot (y_actual: np.ndarray, y_pred: np.ndarray):
+    """[summary]
+
+    Args:
+        y_actual (np.ndarray): [description]
+        y_pred (np.ndarray): [description]
+    """    
     # Shape of y_actual, y_pred: (10337, 1)
     fig, ax = plt.subplots()
     ax.scatter(y_actual[:], y_pred[:])
@@ -168,9 +189,7 @@ def scatter_plot (y_actual, y_pred):
     fig.suptitle('Predicted Value Vs Actual Value')
     ax.set_ylabel('Predicted')
     ax.set_xlabel('Actual')
-    #textstr = 'r2_score=  %.3f' %(r2_score(y_actual, y_pred))
-    #plt.text(250, 450, textstr, horizontalalignment='center', verticalalignment='top', multialignment='center')
-    fig.savefig('%s/scatter_plot.png'%(dir_))
+    fig.savefig('%s/scatter_plot.png'%(results_dir))
     logging.info("Saved scatter plot to disk")
     plt.close()
 
@@ -178,8 +197,17 @@ def scatter_plot (y_actual, y_pred):
 
 
  # Evaluate Model
-def evaluate_model (x_data, yield_data, dataset):
-    
+def evaluate_model (x_data: np.ndarray, yield_data: np.ndarray, dataset: str) -> Dict:
+    """[summary]
+
+    Args:
+        x_data (np.ndarray): [description]
+        yield_data (np.ndarray): [description]
+        dataset (str): [description]
+
+    Returns:
+        Dict: [description]
+    """    
     yield_data_hat = pred_model.predict(x_data, batch_size = batch_size)
     yield_data_hat = YIELD_SCALER.inverse_transform(yield_data_hat)
     
@@ -206,7 +234,7 @@ def evaluate_model (x_data, yield_data, dataset):
     
        
     # Save metrics
-    with open('%s/metrics_%s.csv' %(dir_, dataset), 'w', newline="") as csv_file:  
+    with open('%s/metrics_%s.csv' %(results_dir, dataset), 'w', newline="") as csv_file:  
         writer = csv.writer(csv_file)
         for key, value in metric_dict.items():
             writer.writerow([key, value])    

@@ -1,16 +1,38 @@
-from typing import final
+from typing import Tuple, final
 import numpy as np, pandas as pd
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.model_selection import train_test_split
 import joblib
 
 
-def load_data(weather_path,other_path, cluster_id_path, yield_path):
+def load_data(weather_path:str,other_path:str, cluster_id_path:str, yield_path:str) -> Tuple:
+    """
+    Loads all relevant data for processing via inputted filenames as specified
+
+    Args:
+        weather_path (str): path to weather data
+        other_path (str): path to other data
+        cluster_id_path (str): path to clusterID data
+        yield_path (str): path to yield data
+
+    Returns:
+        Tuple: tuple of arrays where each array is loaded from each path (in order)
+    """    
     return np.load(weather_path), np.load(other_path), np.load(cluster_id_path), np.load(yield_path)
 
 
 
-def clean_other_data(other_data,cluster_id_data):
+def clean_other_data(other_data: np.ndarray,cluster_id_data: np.ndarray) -> np.ndarray:
+    """
+    Takes other data and cluster_id_data. Assigns the proper genotype_id and returns all the data as a onehotencoded matrix. As of now only the first two variables are chosen. This will likely change. 
+
+    Args:
+        other_data (np.ndarray): pre-loaded
+        cluster_id_data (np.ndarray): pre-loaded
+
+    Returns:
+        np.ndarray: OneHotEncoded matrix
+    """    
     other_df = pd.DataFrame(other_data[:,[0,1]])
     other_df.columns = ['Maturity Group', 'Genotype ID']
     for col in other_df.columns:
@@ -24,7 +46,15 @@ def clean_other_data(other_data,cluster_id_data):
 
 
 
-def scale_weather_data(weather_data):
+def scale_weather_data(weather_data: np.ndarray) -> np.ndarray:
+    """[summary]
+
+    Args:
+        weather_data (np.ndarray): [description]
+
+    Returns:
+        np.ndarray: [description]
+    """    
     
     scaler_x = MinMaxScaler(feature_range=(-1, 1))
 
@@ -41,7 +71,17 @@ def scale_weather_data(weather_data):
 
 
 
-def scale_yield_data(yield_data, data_path = '../data/', data_stage = 'development'):
+def scale_yield_data(yield_data: np.ndarray, data_path: str = '../data/', data_stage: str = 'development') -> np.ndarray:
+    """[summary]
+
+    Args:
+        yield_data (np.ndarray): [description]
+        data_path (str, optional): [description]. Defaults to '../data/'.
+        data_stage (str, optional): [description]. Defaults to 'development'.
+
+    Returns:
+        np.ndarray: [description]
+    """    
     scaler_y =  MinMaxScaler(feature_range=(-1, 1))
     yield_train_reshaped = yield_data.reshape((yield_data.shape[0], 1))   # (82692, 1)
     scaler_y = scaler_y.fit(yield_train_reshaped)
@@ -58,7 +98,18 @@ def scale_yield_data(yield_data, data_path = '../data/', data_stage = 'developme
 
 
 
-def combine_weather_other_data(scaled_weather_data, other_data_1he, data_path = '../data/', data_stage = 'development'):
+def combine_weather_other_data(scaled_weather_data: np.ndarray, other_data_1he: np.ndarray, data_path: str = '../data/', data_stage: str = 'development') -> np.ndarray:
+    """[summary]
+
+    Args:
+        scaled_weather_data (np.ndarray): [description]
+        other_data_1he (np.ndarray): [description]
+        data_path (str, optional): [description]. Defaults to '../data/'.
+        data_stage (str, optional): [description]. Defaults to 'development'.
+
+    Returns:
+        np.ndarray: [description]
+    """    
     desired_arr_shape = (scaled_weather_data.shape[0], scaled_weather_data.shape[1], other_data_1he.shape[1] + scaled_weather_data.shape[2])
     new_array = []
     for ind,sub_matrix in enumerate(scaled_weather_data):
@@ -78,7 +129,18 @@ def combine_weather_other_data(scaled_weather_data, other_data_1he, data_path = 
 
 
 
-def split_data_into_training_and_validation(combined_X, scaled_yield, validation_size = 0.25, data_path = '../data/'):
+def split_data_into_training_and_validation(combined_X: np.ndarray, scaled_yield: np.ndarray, validation_size: float = 0.25, data_path: str = '../data/') -> Tuple:
+    """[summary]
+
+    Args:
+        combined_X (np.ndarray): [description]
+        scaled_yield (np.ndarray): [description]
+        validation_size (float, optional): [description]. Defaults to 0.25.
+        data_path (str, optional): [description]. Defaults to '../data/'.
+
+    Returns:
+        Tuple: [description]
+    """    
     combined_X_train, combined_X_validation, scaled_yield_train, scaled_yield_validation = train_test_split(combined_X,scaled_yield,test_size=validation_size)
     if data_path:
         combined_X_train_file_path = data_path + 'combined_data_train.npy'
