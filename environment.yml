@@ -6,7 +6,7 @@ channels:
 dependencies:
   - _libgcc_mutex=0.1=main
   - _openmp_mutex=4.5=1_gnu
-  - _tflow_select=2.3.0=mkl
+  - _tflow_select=2.1.0=gpu
   - absl-py=0.13.0=py39h06a4308_0
   - aiohttp=3.7.4.post0=py39h7f8727e_2
   - astor=0.8.1=py39h06a4308_0
@@ -28,6 +28,9 @@ dependencies:
   - click=8.0.1=pyhd3eb1b0_0
   - coverage=5.5=py39h27cfd23_2
   - cryptography=3.4.8=py39hd23ed53_0
+  - cudatoolkit=10.1.243=h6bb024c_0
+  - cudnn=7.6.5=cuda10.1_0
+  - cupti=10.1.168=0
   - cycler=0.10.0=py39h06a4308_0
   - cython=0.29.24=py39h295c915_0
   - dataclasses=0.8=pyh6d0b6a4_7
@@ -121,9 +124,10 @@ dependencies:
   - sqlite=3.36.0=hc218d9a_0
   - tensorboard=2.4.0=pyhc547734_0
   - tensorboard-plugin-wit=1.6.0=py_0
-  - tensorflow=2.4.1=mkl_py39h4683426_0
-  - tensorflow-base=2.4.1=mkl_py39h43e0292_0
+  - tensorflow=2.4.1=gpu_py39h8236f22_0
+  - tensorflow-base=2.4.1=gpu_py39h29c2da4_0
   - tensorflow-estimator=2.6.0=pyh7b7c402_0
+  - tensorflow-gpu=2.4.1=h30adc30_0
   - termcolor=1.1.0=py39h06a4308_1
   - threadpoolctl=2.2.0=pyh0d69192_0
   - tk=8.6.11=h1ccaba5_0
