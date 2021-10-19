@@ -1,5 +1,5 @@
 # X429midterm
-ISTA429 Midterm project for Team X for MCLAS2021
+ISTA429 Midterm project for Team X
 
 Collaborators:
 - Ryan Papetti
@@ -24,7 +24,7 @@ data
 
 These are necessary for `handle_data.py` to work. This script will set up all other data for you.
 
-Final data dir
+Final data dir structure:
  
 data
 ├── clusterID_genotype.npy
@@ -42,4 +42,61 @@ data
 As you can see, there is training data and validation data created for us. Also, we can run this script, minus the data splitting, to format our test data as well.
 Development data is the entire "training" set before it was split
 
-##
+### Running existing model_train scripts
+
+If you have the environment set up on your machine, you can run the script like any other Python script. This is the same for if you are in an interactive session on the HPC.
+
+If you are trying to train the model through a slurm script, please run `sbatch model_train.script`. To see if it's running, I like to use `squeue -u [netID]`.
+
+Interested in writing your own script? That's okay - just make sure all your log files are pointed to a logs directory. 
+
+
+
+
+
+
+## Ryan Directory set up
+
+X429midterm
+├── data
+│   ├── clusterID_genotype.npy
+│   ├── combined_data_train.npy
+│   ├── combined_data_validation.npy
+│   ├── combined_weather_mgcluster_214_development.npy
+│   ├── inputs_others_train.npy
+│   ├── inputs_weather_train.npy
+│   ├── scaled_yield_development.npy
+│   ├── scaled_yield_train.npy
+│   ├── scaled_yield_validation.npy
+│   └── yield_train.npy
+├── environment.yml
+├── LICENSE
+├── logs
+│   ├── model_train_errors.e2310607
+│   ├── model_train_errors.e2310629
+│   ├── model_train.log
+│   ├── model_train_output.o2310607
+│   └── model_train_output.o2310629
+├── README.md
+├── results
+│   ├── actual_pred_plot.png
+│   ├── loss.csv
+│   ├── metrics_Evaluation.csv
+│   ├── scatter_plot.png
+│   ├── val_loss.csv
+│   └── yield_scaler.sav
+└── scripts
+    ├── conda_test.script
+    ├── CropData.py
+    ├── handle_data.py
+    ├── handle_data.script
+    ├── model_train.py
+    ├── model_train.script
+    └── recent_model
+        ├── assets
+        ├── saved_model.pb
+        └── variables
+            ├── variables.data-00000-of-00001
+            └── variables.index
+
+7 directories, 33 files
