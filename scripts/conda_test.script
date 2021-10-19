@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH --job-name=teamxmidtermtraining
-#SBATCH -e test.e%A
-#SBATCH -o test.o%A
+#SBATCH -e ../logs/condatest.e%A
+#SBATCH -o ../logs/condatest.o%A
 #SBATCH --partition=standard
 #SBATCH --ntasks=1
 #SBATCH --time=1:10:00
@@ -28,7 +28,7 @@ echo 'This script is running on:'
 hostname
 echo $SHELL
 ###conda init bash
-###source ~/.bash_profile
+source ~/.bash_profile
 
 conda activate info529midterm
 echo 'Finished model training'

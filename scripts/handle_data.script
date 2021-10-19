@@ -4,14 +4,14 @@
 #SBATCH -e ../logs/model_train_errors.e%A
 #SBATCH -o ../logs/model_train_output.o%A
 #SBATCH --partition=standard
-#SBATCH --ntasks=1
-#SBATCH --time=5:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=60
+#SBATCH --time=3:00:00
 #SBATCH --account=lyons-lab
-#SBATCH --mem=64GB
-#SBATCH --gres=gpu:pascal:1
+#SBATCH --mem=300GB
+#SBATCH --gres=gpu:1
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ryanpapetti@email.arizona.edu
-
 echo 'This script is running on:'
 hostname
 conda init bash
