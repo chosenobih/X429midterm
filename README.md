@@ -15,17 +15,17 @@ In order to get started, you must set up a `data` directory.
 First, make sure you have anaconda on your machine. Next, make a conda env using the `environment.yml` file with `conda env create -f environment.yml`. 
 If needed, activate the env with `conda activate info529midterm`. Once here, we can run the scripts to organize data.
 
-
+```bash
 data
 ├── clusterID_genotype.npy
 ├── inputs_others_train.npy
 ├── inputs_weather_train.npy
 └── yield_train.npy
-
+```
 These are necessary for `handle_data.py` to work. This script will set up all other data for you.
 
 Final data dir structure:
- 
+```
 data
 ├── clusterID_genotype.npy
 ├── combined_data_train.npy
@@ -37,7 +37,7 @@ data
 ├── scaled_yield_train.npy
 ├── scaled_yield_validation.npy
 └── yield_train.npy
-
+```
 
 As you can see, there is training data and validation data created for us. Also, we can run this script, minus the data splitting, to format our test data as well.
 Development data is the entire "training" set before it was split
@@ -56,7 +56,7 @@ Interested in writing your own script? That's okay - just make sure all your log
 
 
 ## Ryan Directory set up
-
+```bash
 X429midterm
 ├── data
 │   ├── clusterID_genotype.npy
@@ -72,11 +72,7 @@ X429midterm
 ├── environment.yml
 ├── LICENSE
 ├── logs
-│   ├── model_train_errors.e2310607
-│   ├── model_train_errors.e2310629
 │   ├── model_train.log
-│   ├── model_train_output.o2310607
-│   └── model_train_output.o2310629
 ├── README.md
 ├── results
 │   ├── actual_pred_plot.png
@@ -100,3 +96,4 @@ X429midterm
             └── variables.index
 
 7 directories, 33 files
+```
