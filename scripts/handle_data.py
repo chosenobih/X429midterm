@@ -1,4 +1,14 @@
-from typing import Tuple, final
+'''
+Ryan Papetti
+Team X
+INFO 429/529 Midterm
+Fall 2021
+
+handle_data.py contains the methods to convert the standard competition datasets into a meaninful one for training with any mode. Offers utilities to save and split data as well
+'''
+
+
+from typing import Tuple
 import numpy as np, pandas as pd
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.model_selection import train_test_split
@@ -47,13 +57,15 @@ def clean_other_data(other_data: np.ndarray,cluster_id_data: np.ndarray) -> np.n
 
 
 def scale_weather_data(weather_data: np.ndarray) -> np.ndarray:
-    """[summary]
+    """
+    
+    Takes Weather data, reshapes it, and returns a scaled version
 
     Args:
-        weather_data (np.ndarray): [description]
+        weather_data (np.ndarray): pre-loaded
 
     Returns:
-        np.ndarray: [description]
+        np.ndarray: weather_data_scaled
     """    
     
     scaler_x = MinMaxScaler(feature_range=(-1, 1))
@@ -72,15 +84,16 @@ def scale_weather_data(weather_data: np.ndarray) -> np.ndarray:
 
 
 def scale_yield_data(yield_data: np.ndarray, data_path: str = '../data/', data_stage: str = 'development') -> np.ndarray:
-    """[summary]
+    """
+    Scales the yield data, saves the scaler (and the data if data_path is provided), and returns the scaled yield data
 
     Args:
-        yield_data (np.ndarray): [description]
-        data_path (str, optional): [description]. Defaults to '../data/'.
-        data_stage (str, optional): [description]. Defaults to 'development'.
+        yield_data (np.ndarray): pre-loaded
+        data_path (str, optional): Must be provided to save data. Defaults to '../data/'.
+        data_stage (str, optional): Must be provided to save data and acts as an identifier. Defaults to 'development'.
 
     Returns:
-        np.ndarray: [description]
+        np.ndarray: yield_data_scaled
     """    
     scaler_y =  MinMaxScaler(feature_range=(-1, 1))
     yield_train_reshaped = yield_data.reshape((yield_data.shape[0], 1))   # (82692, 1)
@@ -99,16 +112,17 @@ def scale_yield_data(yield_data: np.ndarray, data_path: str = '../data/', data_s
 
 
 def combine_weather_other_data(scaled_weather_data: np.ndarray, other_data_1he: np.ndarray, data_path: str = '../data/', data_stage: str = 'development') -> np.ndarray:
-    """[summary]
+    """
+    Combines the weather and other data via numpy broadcasting and column stacking. Saves data if paths are provided. Returns combined data in a 3-D array
 
     Args:
-        scaled_weather_data (np.ndarray): [description]
-        other_data_1he (np.ndarray): [description]
-        data_path (str, optional): [description]. Defaults to '../data/'.
-        data_stage (str, optional): [description]. Defaults to 'development'.
+        scaled_weather_data (np.ndarray): 3-D scaled weather data
+        other_data_1he (np.ndarray): 2-D one-hot encoded other data
+        data_path (str, optional): Must be provided to save data. Defaults to '../data/'.
+        data_stage (str, optional): Must be provided to save data and acts as an identifier. Defaults to 'development'.
 
     Returns:
-        np.ndarray: [description]
+        np.ndarray: 3-D combined data array
     """    
     desired_arr_shape = (scaled_weather_data.shape[0], scaled_weather_data.shape[1], other_data_1he.shape[1] + scaled_weather_data.shape[2])
     new_array = []
@@ -130,16 +144,17 @@ def combine_weather_other_data(scaled_weather_data: np.ndarray, other_data_1he: 
 
 
 def split_data_into_training_and_validation(combined_X: np.ndarray, scaled_yield: np.ndarray, validation_size: float = 0.25, data_path: str = '../data/') -> Tuple:
-    """[summary]
+    """
+    Splits data into optional training and validation sets. Returns combined_X_train, combined_X_validation, scaled_yield_train, scaled_yield_validation, but is mostly used to save the data instead. 
 
     Args:
-        combined_X (np.ndarray): [description]
-        scaled_yield (np.ndarray): [description]
-        validation_size (float, optional): [description]. Defaults to 0.25.
-        data_path (str, optional): [description]. Defaults to '../data/'.
+        combined_X (np.ndarray): 3-D array of combined data
+        scaled_yield (np.ndarray): 1-D array of yield data
+        validation_size (float, optional): Splitting ratio. Defaults to 0.25.
+        data_path (str, optional): Must be present to save data. Defaults to '../data/'.
 
     Returns:
-        Tuple: [description]
+        Tuple: combined_X_train, combined_X_validation, scaled_yield_train, scaled_yield_validation
     """    
     combined_X_train, combined_X_validation, scaled_yield_train, scaled_yield_validation = train_test_split(combined_X,scaled_yield,test_size=validation_size)
     if data_path:
