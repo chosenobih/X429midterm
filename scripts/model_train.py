@@ -24,14 +24,16 @@ VALIDATION_LABELS = np.load("../data/scaled_yield_validation.npy", allow_pickle=
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
 os.environ["KERAS_BACKEND"] = "tensorflow"
- 
-h_s =256   # {32, 64, 96, 128, 256}
-dropout = 0.4  
-batch_size = 512  
-epochs = 50   # 100
-lr_rate = 0.001   # (0.001, 3e-4, 5e-4)
-con_dim = 2   # (1, 2, 4, 8, 16) # Reduction in dimension of the temporal context to con_dim before concat with MG, Cluster
 
+
+### CHANGE THESE BELOW FOR MESSING WITH MODEL
+ 
+h_s = 512   # {32, 64, 96, 128, 256}
+dropout = 0.4  # {0.05, 0.1, 0.2, 0.4, 0.4, 0.5}
+batch_size = 512 # paper said this didn't matter much. Dont change  
+epochs = 50   # Try not to go above 50 - it will stop when it starts to overfit
+lr_rate = 0.001   # (0.001, 3e-4, 5e-4)
+### DO NOT CHANGE BELOW
 
 # Model
 t_densor = Dense(1, activation = "relu")
