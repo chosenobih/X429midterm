@@ -1,6 +1,6 @@
 import os, logging, joblib, csv, numpy as np, matplotlib.pyplot as plt, pandas as pd
 from typing import Dict, Tuple
-from keras.layers import Concatenate, Dot, Input, GRU, Dense
+from keras.layers import Concatenate, Dot, Input, LSTM, Dense
 from keras.layers import Dropout, Flatten, Activation
 from keras.models import Model
 from keras.callbacks import EarlyStopping
@@ -28,10 +28,10 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 
 ### CHANGE THESE BELOW FOR MESSING WITH MODEL
  
-h_s = 512   # {32, 64, 96, 128, 256}
-dropout = 0.4  # {0.05, 0.1, 0.2, 0.4, 0.4, 0.5}
+h_s = 256   # {32, 64, 96, 128, 256}
+dropout = 0.2  # {0.05, 0.1, 0.2, 0.4, 0.4, 0.5}
 batch_size = 512 # paper said this didn't matter much. Dont change  
-epochs = 50   # Try not to go above 50 - it will stop when it starts to overfit
+epochs = 25   # Try not to go above 50 - it will stop when it starts to overfit
 lr_rate = 0.001   # (0.001, 3e-4, 5e-4)
 ### DO NOT CHANGE BELOW
 
@@ -68,14 +68,22 @@ def model(Tx: int, var_ts: int, h_s: int, dropout: float) -> Model:
     encoder_input = Input(shape = (Tx, var_ts))   # (None, 30, 7)
         
     # Encoder GRU, Pre-attention        
-    GRU_1, state_h, state_c = GRU(h_s, return_state=True, return_sequences=True)(encoder_input)
-    GRU_1 = Dropout (dropout)(GRU_1)     # (None, 30, 32)
+    LSTM_1, state_h, state_c = LSTM(h_s, return_state=True, return_sequences=True)(encoder_input)
+    LSTM_1 = Dropout (dropout)(LSTM_1)     # (None, 30, 32)
+
+    LSTM_2, state_h, state_c = LSTM(h_s, return_state=True, return_sequences=True)(LSTM_1)
+    LSTM_2 = Dropout (dropout)(LSTM_2)     # (None, 30, 32)
+
     
-    GRU_2, state_h, state_c = GRU(h_s, return_state=True, return_sequences=False)(GRU_1)
-    GRU_2 = Dropout (dropout)(GRU_2)     # (None, 30, 32)
+    LSTM_3, state_h, state_c = LSTM(h_s, return_state=True, return_sequences=True)(LSTM_2)
+    LSTM_3 = Dropout (dropout)(LSTM_3)     # (None, 30, 32)
+
+    LSTM_4, state_h, state_c = LSTM(h_s, return_state=True, return_sequences=False)(LSTM_3)
+    LSTM_4 = Dropout (dropout)(LSTM_4)     # (None, 30, 32)
+
     
     # FC Layer
-    yhat = Dense (1, activation = "linear")(GRU_2)   # (None, 1)
+    yhat = Dense (1, activation = "linear")(LSTM_4)   # (None, 1)
         
 
     pred_model = Model(encoder_input, yhat)   # Prediction Model
@@ -101,7 +109,7 @@ hist = pred_model.fit (TRAIN_DATA, TRAIN_LABELS,
                   shuffle = True,
                   validation_data=(VALIDATION_DATA,VALIDATION_LABELS))
 
-pred_model.save(f'{results_dir}/GRU_recent_model')
+pred_model.save(f'{results_dir}deep_lstm_recent_model')
 
 # Plot
 loss = hist.history['loss']
@@ -128,8 +136,8 @@ def plot_loss(loss: np.ndarray, val_loss: np.ndarray):
 
 
 # Save Data
-loss = pd.DataFrame(loss).to_csv('%s/GRU_attention_loss.csv'%(results_dir))    # Not in original scale 
-val_loss = pd.DataFrame(val_loss).to_csv('%s/GRU_attention_val_loss.csv'%(results_dir))  # Not in original scale
+loss = pd.DataFrame(loss).to_csv('%s/deep_lstm_attention_loss.csv'%(results_dir))    # Not in original scale 
+val_loss = pd.DataFrame(val_loss).to_csv('%s/deep_lstm_attention_val_loss.csv'%(results_dir))  # Not in original scale
 # plot_loss(loss,val_loss)
 
 
@@ -148,7 +156,7 @@ def actual_pred_plot (y_actual: np.ndarray, y_pred: np.ndarray, n_samples: int =
     ax.plot(y_actual[ : n_samples])  # n_samples examples
     ax.plot(y_pred[ : n_samples])    # n_samples examples
     ax.legend(['Ground Truth', 'Model Prediction'], loc='upper right')
-    fig.savefig('%s/GRU_actual_pred_plot.png'%(results_dir))
+    fig.savefig('%s/deep_lstm_actual_pred_plot.png'%(results_dir))
     logging.info("Saved actual vs pred plot to disk")
     plt.close(fig)
 
@@ -167,7 +175,7 @@ def scatter_plot (y_actual: np.ndarray, y_pred: np.ndarray):
     fig.suptitle('Predicted Value Vs Actual Value')
     ax.set_ylabel('Predicted')
     ax.set_xlabel('Actual')
-    fig.savefig('%s/GRU_scatter_plot.png'%(results_dir))
+    fig.savefig('%s/deep_lstm_scatter_plot.png'%(results_dir))
     logging.info("Saved scatter plot to disk")
     plt.close(fig)
 
@@ -212,7 +220,7 @@ def evaluate_model (x_data: np.ndarray, yield_data: np.ndarray, dataset: str) ->
     
        
     # Save metrics
-    with open('%s/GRU_metrics_%s.csv' %(results_dir, dataset), 'w', newline="") as csv_file:  
+    with open('%s/deep_lstm_metrics_%s.csv' %(results_dir, dataset), 'w', newline="") as csv_file:  
         writer = csv.writer(csv_file)
         for key, value in metric_dict.items():
             writer.writerow([key, value])    

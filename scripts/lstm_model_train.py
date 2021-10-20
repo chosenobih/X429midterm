@@ -28,10 +28,10 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 
 ### CHANGE THESE BELOW FOR MESSING WITH MODEL
  
-h_s = 512   # {32, 64, 96, 128, 256}
-dropout = 0.4  # {0.05, 0.1, 0.2, 0.4, 0.4, 0.5}
+h_s = 256   # {32, 64, 96, 128, 256}
+dropout = 0.25  # {0.05, 0.1, 0.2, 0.4, 0.4, 0.5}
 batch_size = 512 # paper said this didn't matter much. Dont change  
-epochs = 50   # Try not to go above 50 - it will stop when it starts to overfit
+epochs = 25   # Try not to go above 50 - it will stop when it starts to overfit
 lr_rate = 0.001   # (0.001, 3e-4, 5e-4)
 ### DO NOT CHANGE BELOW
 
