@@ -109,7 +109,7 @@ hist = pred_model.fit (TRAIN_DATA, TRAIN_LABELS,
                   shuffle = True,
                   validation_data=(VALIDATION_DATA,VALIDATION_LABELS))
 
-pred_model.save(f'{results_dir}deep_lstm_recent_model')
+pred_model.save(f'{results_dir}/deep_lstm_recent_model')
 
 # Plot
 loss = hist.history['loss']

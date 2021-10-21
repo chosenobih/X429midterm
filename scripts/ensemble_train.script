@@ -21,4 +21,5 @@ conda activate info529midterm
 python model_train.py
 python lstm_model_train.py
 python lstm_deep_model_train.py
+python ensemble_evaluation.py
 echo 'Finished training multiple models'

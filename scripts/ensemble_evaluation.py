@@ -1,15 +1,10 @@
 import os, logging, joblib, csv, numpy as np, matplotlib.pyplot as plt, pandas as pd
 from typing import Dict, Tuple
-from keras.layers import Concatenate, Dot, Input, LSTM, Dense
-from keras.layers import Dropout, Flatten, Activation
-from keras.models import Model
-from keras.callbacks import EarlyStopping
-from keras.activations import softmax
+from keras.models import Model, load_model
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-from keras.optimizers import Adam
 from math import sqrt
 
-logging.basicConfig(filename='../logs/model_train.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
+logging.basicConfig(filename='../logs/ensemble_evaluation.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
 
 allow_pickle_flag = True
 
@@ -20,6 +15,14 @@ YIELD_SCALER = joblib.load(results_dir + '/yield_scaler.sav')
 
 VALIDATION_DATA = np.load('../data/combined_data_validation.npy', allow_pickle=allow_pickle_flag) 
 VALIDATION_LABELS = np.load("../data/scaled_yield_validation.npy", allow_pickle=allow_pickle_flag)
+
+
+
+OG_MODEL = load_model('../results/lstm_attention_recent_model')
+LSTM_MODEL = load_model('../results/lstm_recent_model')
+LSTM_DEEP_MODEL = load_model('../results/deep_lstm_recent_model')
+
+
 
 class EnsembleModel:
     def __init__(self, compiled_models, yield_scaler) -> None:
@@ -38,10 +41,10 @@ class EnsembleModel:
 
 
     def evaluate_ensemble(self,X_data,yield_data, batch_size, dataset):
-        yield_data_hat = self.ensemble.predict(X_data, batch_size = batch_size)
-        yield_data_hat = YIELD_SCALER.inverse_transform(yield_data_hat)
+        yield_data_hat = self.predict(X_data, batch_size = batch_size)
+        yield_data_hat = self.yield_scaler.inverse_transform(yield_data_hat)
         
-        yield_data = YIELD_SCALER.inverse_transform(yield_data)
+        yield_data = self.yield_scaler.inverse_transform(yield_data)
         
         metric_dict = {}  # Dictionary to save the metrics
         
@@ -64,11 +67,14 @@ class EnsembleModel:
         
         
         # Save metrics
-        with open('%s/ensemble_metrics_%s.csv' %(results_dir, dataset), 'w', newline="") as csv_file:  
+        logging.info('saving metrics to csv file')
+        desired_path = f'{results_dir}/ensemble_metrics{dataset}.csv'
+        logging.info(f'Saving to {desired_path}')
+        with open(desired_path, 'w', newline="") as csv_file:  
             writer = csv.writer(csv_file)
             for key, value in metric_dict.items():
                 writer.writerow([key, value])    
-            
+        logging.info('Written to csv file')
         return metric_dict
 
 
@@ -89,7 +95,7 @@ class EnsembleModel:
         ax.plot(y_actual[ : n_samples])  # n_samples examples
         ax.plot(y_pred[ : n_samples])    # n_samples examples
         ax.legend(['Ground Truth', 'Model Prediction'], loc='upper right')
-        fig.savefig('%s/lstm_attention_actual_pred_plot.png'%(results_dir))
+        fig.savefig('%s/ensemble_actual_pred_plot.png'%(results_dir))
         logging.info("Saved actual vs pred plot to disk")
         plt.close(fig)
 
@@ -108,12 +114,13 @@ class EnsembleModel:
         fig.suptitle('Predicted Value Vs Actual Value')
         ax.set_ylabel('Predicted')
         ax.set_xlabel('Actual')
-        fig.savefig('%s/lstm_attention_scatter_plot.png'%(results_dir))
+        fig.savefig('%s/ensemble_scatter_plot.png'%(results_dir))
         logging.info("Saved scatter plot to disk")
         plt.close(fig)
 
 
 
 
-
+ryan_ensemble = EnsembleModel([OG_MODEL, LSTM_MODEL, LSTM_DEEP_MODEL], YIELD_SCALER)
+ryan_ensemble.evaluate_ensemble(VALIDATION_DATA, VALIDATION_LABELS, batch_size=512, dataset = 'Evaluation')
 
