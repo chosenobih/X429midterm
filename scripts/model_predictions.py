@@ -8,7 +8,7 @@ logging.basicConfig(filename='../logs/test_model_predictions.log', level=logging
 
 allow_pickle_flag = True
 
-TEST_DATA = np.load('../data/combined_TEST.npy', allow_pickle=allow_pickle_flag)
+TEST_DATA = np.load('../data/TEST/combined_TEST.npy', allow_pickle=allow_pickle_flag)
 results_dir = '../results'
 YIELD_SCALER = joblib.load(results_dir + '/yield_scaler.sav')
 
