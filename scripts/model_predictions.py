@@ -18,8 +18,9 @@ OG_MODEL = load_model('../results/lstm_attention_recent_model')
 LSTM_MODEL = load_model('../results/lstm_recent_model')
 LSTM_DEEP_MODEL = load_model('../results/deep_lstm_recent_model')
 
-
-ryan_ensemble = EnsembleModel([OG_MODEL, LSTM_MODEL, LSTM_DEEP_MODEL], YIELD_SCALER)
+ryan_model_weights = np.array([0.2,0.4,0.4])
+ryan_models = [OG_MODEL, LSTM_MODEL, LSTM_DEEP_MODEL]
+ryan_ensemble = EnsembleModel(ryan_models, YIELD_SCALER, ryan_model_weights)
 test_predictions = ryan_ensemble.predict(TEST_DATA, batch_size=512)
 ryan_ensemble.write_predictions(test_predictions)
 

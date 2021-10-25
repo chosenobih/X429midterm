@@ -35,7 +35,7 @@ class EnsembleModel:
 
     def predict(self,X_data, batch_size):
         final_results = np.array([model.predict(X_data,batch_size = batch_size) for model in self.ensemble])
-        if self.model_weights:
+        if self.model_weights is not None:
             return np.average(final_results,axis=0,weights=self.model_weights)
         else:
             return final_results.mean(axis=0)
