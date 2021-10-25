@@ -11,6 +11,9 @@ test_handle_data.py contains the methods to convert the standard competition dat
 from typing import Tuple
 import numpy as np, pandas as pd
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
+import logging
+
+logging.basicConfig(filename='../logs/test_handle_data.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
 
 def load_data(weather_path:str,other_path:str, cluster_id_path:str) -> Tuple:
     """
@@ -28,6 +31,25 @@ def load_data(weather_path:str,other_path:str, cluster_id_path:str) -> Tuple:
 
 
 
+
+
+def find_differences_between_train_test_other_data(training_data:np.ndarray, test_data:np.ndarray):
+    for col in range((training_data.shape[1])):
+        if col != 1:
+            relevant_train_data = training_data[:,col]
+            relevant_test_data = test_data[:,col]
+
+            train_set = set(relevant_train_data)
+            test_set = set(relevant_test_data)
+
+            desired_set = (train_set | test_set) - (train_set & test_set)
+
+            if desired_set:
+                logging.info(f'Column {col} is not the same for both sets. Train set has {train_set} ({len(train_set)} elements) while test set has {test_set} ({len(test_set)} elements)') 
+                logging.info(f'The difference is {desired_set}')
+
+
+
 def clean_other_data(other_data: np.ndarray,cluster_id_data: np.ndarray) -> np.ndarray:
     """
     Takes other data and cluster_id_data. Assigns the proper genotype_id and returns all the data as a onehotencoded matrix. As of now only the first two variables are chosen. This will likely change. 
@@ -39,15 +61,27 @@ def clean_other_data(other_data: np.ndarray,cluster_id_data: np.ndarray) -> np.n
     Returns:
         np.ndarray: OneHotEncoded matrix
     """    
-    other_df = pd.DataFrame(other_data[:,[0,1]])
-    other_df.columns = ['Maturity Group', 'Genotype ID']
-    for col in other_df.columns:
+    other_df = pd.DataFrame(other_data)
+    other_df.columns = ['Maturity Group', 'Genotype ID', 'State', 'Year', 'Location']
+    for col in ['Maturity Group', 'Genotype ID', 'Year', 'Location']:
         other_df[col] = other_df[col].astype(np.float32).astype(int)
+
     other_df['Genotype ID'] -= 1 #to match indexing for cluster_id_data
     cluster_id_mapper = lambda genotype_id: cluster_id_data[genotype_id]
+    state_cleaner = lambda state: ''.join([char for char in state if char.isalpha()])
     other_df['Genotype ID'] = other_df['Genotype ID'].apply(cluster_id_mapper)
+    other_df['State'] = other_df['State'].apply(state_cleaner)
+
+    #PLEASE READ BELOW
+
+    #IN ORDER TO MAKE THE TEST SET MATCH THE FORMAT OF THE TRAIN SET, WE ARE GOING TO ADD AN EXTRA RECORD WITH THE MISSING LOCATION FROM THE 
+    # TRAINING SET
+    other_df = other_df[other_df['Location'] != 162]
+
     #now one hot encode all data 
-    return OneHotEncoder().fit_transform(other_df).toarray().astype('float32')
+    one_hot_encoded_data = OneHotEncoder().fit_transform(other_df).toarray().astype('float32')
+    assert one_hot_encoded_data.shape[1] == 229
+    return one_hot_encoded_data
 
 
 
@@ -114,6 +148,8 @@ def main():
     cluster_path = data_path + 'clusterID_genotype.npy'   
     paths_in_order = [weather_path,other_path,cluster_path] 
     weather_data, other_data, cluster_data = load_data(*paths_in_order) 
+    # TRAINING_OTHER = np.load(data_path + 'development ohe_other_data.npy', allow_pickle=True)
+    # find_differences_between_train_test_other_data(TRAINING_OTHER,other_data)
 
     encoded_other_data = clean_other_data(other_data,cluster_data)
     scaled_weather_data = scale_weather_data(weather_data)

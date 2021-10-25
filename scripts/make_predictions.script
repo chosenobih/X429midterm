@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#SBATCH --job-name=teamxmidtermtest
+#SBATCH -e ../logs/model_predict_errors.e
+#SBATCH -o ../logs/model_predict_output.o
+#SBATCH --partition=standard
+#SBATCH --nodes=1
+#SBATCH --ntasks=60
+#SBATCH --time=2:00:00
+#SBATCH --account=lyons-lab
+#SBATCH --mem=100GB
+#SBATCH --gres=gpu:1
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=ryanpapetti@email.arizona.edu
+
+echo 'This script is running on:'
+hostname
+conda init bash
+source ~/.bash_profile
+conda activate info529midterm
+python test_handle_data.py
+python model_predictions.py
+echo 'Finished training multiple models'

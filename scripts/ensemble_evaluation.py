@@ -25,23 +25,30 @@ LSTM_DEEP_MODEL = load_model('../results/deep_lstm_recent_model')
 
 
 class EnsembleModel:
-    def __init__(self, compiled_models, yield_scaler) -> None:
+    def __init__(self, compiled_models, yield_scaler, model_weights = None) -> None:
         self.ensemble = compiled_models
         self.yield_scaler = yield_scaler
+        self.model_weights = model_weights
     
 
 
 
     def predict(self,X_data, batch_size):
         final_results = np.array([model.predict(X_data,batch_size = batch_size) for model in self.ensemble])
-        return final_results.mean(axis=0)
+        if self.model_weights is not None:
+            return np.average(final_results,axis=0,weights=self.model_weights)
+        else:
+            return final_results.mean(axis=0)
 
     
-    def write_predictions(self,predictions, data_stage = 'test'):
+    def write_predictions(self,predictions, data_stage = 'TEST'):
         predicted_yield = self.yield_scaler.inverse_transform(predictions)
         
-        with open(f'{data_stage}_predictions.npy','wb') as writer:
+        with open(f'../data/{data_stage}_predictions.npy','wb') as writer:
             np.save(writer,predicted_yield)
+
+        with open(f'../data/{data_stage}_predictions_noscale.npy','wb') as writer:
+            np.save(writer,predictions)        
 
 
     def evaluate_ensemble(self,X_data,yield_data, batch_size, dataset):
@@ -72,7 +79,7 @@ class EnsembleModel:
         
         # Save metrics
         logging.info('saving metrics to csv file')
-        desired_path = f'{results_dir}/ensemble_metrics{dataset}.csv'
+        desired_path = f'{results_dir}/ensemble_metrics_{dataset}.csv'
         logging.info(f'Saving to {desired_path}')
         with open(desired_path, 'w', newline="") as csv_file:  
             writer = csv.writer(csv_file)
@@ -124,7 +131,8 @@ class EnsembleModel:
 
 
 
-
-ryan_ensemble = EnsembleModel([OG_MODEL, LSTM_MODEL, LSTM_DEEP_MODEL], YIELD_SCALER)
+ryan_model_weights = np.array([0.2,0.4,0.4])
+ryan_models = [OG_MODEL, LSTM_MODEL, LSTM_DEEP_MODEL]
+ryan_ensemble = EnsembleModel(ryan_models, YIELD_SCALER, ryan_model_weights)
 ryan_ensemble.evaluate_ensemble(VALIDATION_DATA, VALIDATION_LABELS, batch_size=512, dataset = 'Evaluation')
 
