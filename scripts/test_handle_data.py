@@ -11,6 +11,9 @@ test_handle_data.py contains the methods to convert the standard competition dat
 from typing import Tuple
 import numpy as np, pandas as pd
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
+import logging
+
+logging.basicConfig(filename='../logs/test_handle_data.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
 
 def load_data(weather_path:str,other_path:str, cluster_id_path:str) -> Tuple:
     """
@@ -25,6 +28,25 @@ def load_data(weather_path:str,other_path:str, cluster_id_path:str) -> Tuple:
         Tuple: tuple of arrays where each array is loaded from each path (in order)
     """    
     return np.load(weather_path), np.load(other_path), np.load(cluster_id_path)
+
+
+
+
+
+def find_differences_between_train_test_other_data(training_data:np.ndarray, test_data:np.ndarray):
+    for col in range((training_data.shape[1])):
+        if col != 1:
+            relevant_train_data = training_data[:,col]
+            relevant_test_data = test_data[:,col]
+
+            train_set = set(relevant_train_data)
+            test_set = set(relevant_test_data)
+
+            desired_set = (train_set | test_set) - (train_set & test_set)
+
+            if desired_set:
+                logging.info(f'Column {col} is not the same for both sets. Train set has {train_set} ({len(train_set)} elements) while test set has {test_set} ({len(test_set)} elements)') 
+                logging.info(f'The difference is {desired_set}')
 
 
 
@@ -54,13 +76,12 @@ def clean_other_data(other_data: np.ndarray,cluster_id_data: np.ndarray) -> np.n
 
     #IN ORDER TO MAKE THE TEST SET MATCH THE FORMAT OF THE TRAIN SET, WE ARE GOING TO ADD AN EXTRA RECORD WITH THE MISSING LOCATION FROM THE 
     # TRAINING SET
-    new_record = other_df.iloc[-1].copy()
-    new_record['Location'] = 162 #YES THIS HAS TO BE HARDCODED
-    other_df.loc['New'] = new_record
+    other_df = other_df[other_df['Location'] != 162]
+
     #now one hot encode all data 
     one_hot_encoded_data = OneHotEncoder().fit_transform(other_df).toarray().astype('float32')
-    assert one_hot_encoded_data.shape[1] == 230
-    return one_hot_encoded_data[:-1] #YEP THE LAST RECORD IS JUST THERE TO ADD A NEW LOCATION RECORD TO MAKE SURE THE OHE IS THE SAME
+    assert one_hot_encoded_data.shape[1] == 229
+    return one_hot_encoded_data
 
 
 
@@ -127,6 +148,8 @@ def main():
     cluster_path = data_path + 'clusterID_genotype.npy'   
     paths_in_order = [weather_path,other_path,cluster_path] 
     weather_data, other_data, cluster_data = load_data(*paths_in_order) 
+    # TRAINING_OTHER = np.load(data_path + 'development ohe_other_data.npy', allow_pickle=True)
+    # find_differences_between_train_test_other_data(TRAINING_OTHER,other_data)
 
     encoded_other_data = clean_other_data(other_data,cluster_data)
     scaled_weather_data = scale_weather_data(weather_data)

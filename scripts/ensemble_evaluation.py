@@ -47,6 +47,9 @@ class EnsembleModel:
         with open(f'../data/{data_stage}_predictions.npy','wb') as writer:
             np.save(writer,predicted_yield)
 
+        with open(f'../data/{data_stage}_predictions_noscale.npy','wb') as writer:
+            np.save(writer,predictions)        
+
 
     def evaluate_ensemble(self,X_data,yield_data, batch_size, dataset):
         yield_data_hat = self.predict(X_data, batch_size = batch_size)
