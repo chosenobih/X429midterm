@@ -51,7 +51,7 @@ def clean_other_data(other_data: np.ndarray,cluster_id_data: np.ndarray) -> np.n
     other_df['State'] = other_df['State'].apply(state_cleaner)
     #now one hot encode all data 
     one_hot_encoded_data = OneHotEncoder().fit_transform(other_df).toarray().astype('float32')
-    assert one_hot_encoded_data.shape[1:] == (214,237)
+    assert one_hot_encoded_data.shape[1] == 230
     return one_hot_encoded_data
 
 
