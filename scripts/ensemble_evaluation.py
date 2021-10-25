@@ -44,7 +44,7 @@ class EnsembleModel:
     def write_predictions(self,predictions, data_stage = 'test'):
         predicted_yield = self.yield_scaler.inverse_transform(predictions)
         
-        with open(f'{data_stage}_predictions.npy','wb') as writer:
+        with open(f'../results/{data_stage}_predictions.npy','wb') as writer:
             np.save(writer,predicted_yield)
 
 
