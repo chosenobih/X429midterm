@@ -62,6 +62,7 @@ def clean_other_data(other_data: np.ndarray,cluster_id_data: np.ndarray) -> np.n
     #now one hot encode all data 
     one_hot_encoded_data = OneHotEncoder().fit_transform(other_df).toarray().astype('float32')
     logging.info('One hot encoded all data')
+    assert one_hot_encoded_data.shape[1:] == (214,237)
     return one_hot_encoded_data
 
 
