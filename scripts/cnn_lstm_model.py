@@ -75,17 +75,13 @@ def model(Tx: int, var_ts: int, h_s: int, dropout: float) -> Model:
 
     dropout_layer = Dropout(dropout)
 
-    first_conv_layer = Conv1D(filters=32, kernel_size=5,strides=1, padding="causal",activation="relu",input_shape=(Tx, var_ts))
+    first_conv_layer = Conv1D(filters=64, kernel_size=5,strides=1, padding="causal",activation="relu",input_shape=(Tx, var_ts))
 
     first_lstm_layer = LSTM(h_s, return_sequences=True)
-    second_lstm_layer = LSTM(h_s, return_sequences=True)
-
-    first_dense_layer = Dense(30, activation="relu")
-
-    second_dense_layer = Dense(10, activation="relu")
+    second_lstm_layer = LSTM(int(3/5 * h_s), return_sequences=False)
 
     output_layer = Dense(1)
-    pred_model = Sequential([first_conv_layer,first_lstm_layer, dropout_layer, second_lstm_layer, dropout_layer, first_dense_layer,second_dense_layer,output_layer])
+    pred_model = Sequential([first_conv_layer,first_lstm_layer, dropout_layer, second_lstm_layer,output_layer])
         
     return pred_model
 
@@ -135,8 +131,8 @@ def plot_loss(loss: np.ndarray, val_loss: np.ndarray):
 
 
 # Save Data
-loss = pd.DataFrame(loss).to_csv('%s/lstm_attention_loss.csv'%(results_dir))    # Not in original scale 
-val_loss = pd.DataFrame(val_loss).to_csv('%s/lstm_attention_val_loss.csv'%(results_dir))  # Not in original scale
+loss = pd.DataFrame(loss).to_csv('%s/cnn_lstm_loss.csv'%(results_dir))    # Not in original scale 
+val_loss = pd.DataFrame(val_loss).to_csv('%s/cnn_lstm_val_loss.csv'%(results_dir))  # Not in original scale
 # plot_loss(loss,val_loss)
 
 
@@ -174,7 +170,9 @@ def scatter_plot (y_actual: np.ndarray, y_pred: np.ndarray):
     fig.suptitle('Predicted Value Vs Actual Value')
     ax.set_ylabel('Predicted')
     ax.set_xlabel('Actual')
-    fig.savefig('%s/CNN_LSTM_scatter_plot.png'%(results_dir))
+    fig_file = '%s/cnn_lstm_scatter_plot.png'%(results_dir)
+    logging.info('Saving to fig file {}'.format(fig_file))
+    fig.savefig(fig_file)
     logging.info("Saved scatter plot to disk")
     plt.close(fig)
 
@@ -219,7 +217,9 @@ def evaluate_model (x_data: np.ndarray, yield_data: np.ndarray, dataset: str) ->
     
        
     # Save metrics
-    with open('%s/cnn_lstm_metrics_%s.csv' %(results_dir, dataset), 'w', newline="") as csv_file:  
+    logging.info('Getting ready to save to file')
+    output_file = '%s/cnn_lstm_metrics_%s.csv' %(results_dir,dataset)
+    with open(output_file, 'w', newline="") as csv_file:  
         writer = csv.writer(csv_file)
         for key, value in metric_dict.items():
             writer.writerow([key, value])    
