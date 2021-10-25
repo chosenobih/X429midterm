@@ -1,15 +1,22 @@
 import os, logging, joblib, csv, numpy as np, matplotlib.pyplot as plt, pandas as pd
 from typing import Dict, Tuple
-from keras.layers import Concatenate, Dot, Input, LSTM, Dense
+from keras.layers import Concatenate, Dot, Input, LSTM, Dense, Conv1D
 from keras.layers import Dropout, Flatten, Activation
-from keras.models import Model
+from keras.models import Model, Sequential
 from keras.callbacks import EarlyStopping
 from keras.activations import softmax
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from keras.optimizers import Adam
 from math import sqrt
 
-logging.basicConfig(filename='../logs/model_train.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
+# if running locally (Ryan)
+import tensorflow as tf
+config = tf.compat.v1.ConfigProto()
+config.gpu_options.allow_growth = True
+sess = tf.compat.v1.Session(config=config)
+sess.as_default()
+
+logging.basicConfig(filename='../logs/cnn_lstm_model_train.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
 
 allow_pickle_flag = True
 
@@ -47,19 +54,9 @@ dotor = Dot(axes = 1)
 concatenator = Concatenate(axis=-1)
 flatten = Flatten()
 
-# Temporal Attention
-def temporal_one_step_attention(a):
-    
-    # a: Sequence of encoder hidden states (n_sample, 10, 16)
-    e_temporal = t_densor(a)  # (n_samples, 10, 1)
-    alphas = activator(e_temporal)    # (n_samples, 10, 1)
-    t_context = dotor([alphas, a])    # (n_samples, 1, 16)
-    
-    return t_context, alphas, e_temporal
 
 
-
-def model(Tx: int, var_ts: int, h_s: int, dropout: float) -> Tuple:
+def model(Tx: int, var_ts: int, h_s: int, dropout: float) -> Model:
     """[summary]
 
     Args:
@@ -75,38 +72,23 @@ def model(Tx: int, var_ts: int, h_s: int, dropout: float) -> Tuple:
     # Tx : Number of input timesteps
     # var_ts: Number of input variables
     # h_s: Hidden State Dimension
-    encoder_input = Input(shape = (Tx, var_ts))   # (None, 30, 7)
-    
-    # Lists to store attention weights
-    alphas_list = []
-    
-    # Encoder LSTM, Pre-attention        
-    lstm_1, state_h, state_c = LSTM(h_s, return_state=True, return_sequences=True)(encoder_input)
-    lstm_1 = Dropout (dropout)(lstm_1)     # (None, 30, 32)
-    
-    lstm_2, state_h, state_c = LSTM(h_s, return_state=True, return_sequences=True)(lstm_1)
-    lstm_2 = Dropout (dropout)(lstm_2)     # (None, 30, 32)
-    
-    # Temporal Attention
-    t_context, alphas, e_temporal = temporal_one_step_attention (lstm_2)  # (None, 1, 32)
-    t_context = flatten(t_context)  # (None, 32)
-    
-    # FC Layer
-    yhat = Dense (1, activation = "linear")(t_context)   # (None, 1)
-        
-    # Append lists
-    alphas_list.append(alphas)
-    alphas_list.append(yhat)
 
-    pred_model = Model(encoder_input, yhat)   # Prediction Model
-    prob_model = Model(encoder_input, alphas_list)    # Weights Model
+    dropout_layer = Dropout(dropout)
+
+    first_conv_layer = Conv1D(filters=64, kernel_size=5,strides=1, padding="causal",activation="relu",input_shape=(Tx, var_ts))
+
+    first_lstm_layer = LSTM(h_s, return_sequences=True)
+    second_lstm_layer = LSTM(int(3/5 * h_s), return_sequences=False)
+
+    output_layer = Dense(1)
+    pred_model = Sequential([first_conv_layer,first_lstm_layer, dropout_layer, second_lstm_layer,output_layer])
         
-    return pred_model, prob_model
+    return pred_model
 
 
 
 # Model Summary
-pred_model, prob_model = model(Tx = 214, var_ts = TRAIN_DATA.shape[2], h_s = h_s, dropout = dropout)
+pred_model = model(Tx = 214, var_ts = TRAIN_DATA.shape[2], h_s = h_s, dropout = dropout)
 pred_model.summary()
 callback_lists = [EarlyStopping(monitor = 'val_loss', patience=3)]
 
@@ -122,10 +104,7 @@ hist = pred_model.fit (TRAIN_DATA, TRAIN_LABELS,
                   shuffle = True,
                   validation_data=(VALIDATION_DATA,VALIDATION_LABELS))
 
-pred_model.save(f'{results_dir}/lstm_attention_recent_model')
-
-# Attention Weights Model
-prob_model.set_weights(pred_model.get_weights())
+pred_model.save(f'{results_dir}/cnn_lstm_recent_model')
 
 # Plot
 loss = hist.history['loss']
@@ -146,14 +125,14 @@ def plot_loss(loss: np.ndarray, val_loss: np.ndarray):
     ax.set_ylabel('Loss')
     ax.set_xlabel('Epoch')
     ax.legend(['Training Set', 'Validation Set'], loc='upper right')
-    fig.savefig('%s/lstm_attention_loss_plot.png'%(results_dir))
+    fig.savefig('%s/CNN_LSTM_loss_plot.png'%(results_dir))
     logging.info("Saved loss plot to disk")
     plt.close(fig)
 
 
 # Save Data
-loss = pd.DataFrame(loss).to_csv('%s/lstm_attention_loss.csv'%(results_dir))    # Not in original scale 
-val_loss = pd.DataFrame(val_loss).to_csv('%s/lstm_attention_val_loss.csv'%(results_dir))  # Not in original scale
+loss = pd.DataFrame(loss).to_csv('%s/cnn_lstm_loss.csv'%(results_dir))    # Not in original scale 
+val_loss = pd.DataFrame(val_loss).to_csv('%s/cnn_lstm_val_loss.csv'%(results_dir))  # Not in original scale
 # plot_loss(loss,val_loss)
 
 
@@ -172,7 +151,7 @@ def actual_pred_plot (y_actual: np.ndarray, y_pred: np.ndarray, n_samples: int =
     ax.plot(y_actual[ : n_samples])  # n_samples examples
     ax.plot(y_pred[ : n_samples])    # n_samples examples
     ax.legend(['Ground Truth', 'Model Prediction'], loc='upper right')
-    fig.savefig('%s/lstm_attention_actual_pred_plot.png'%(results_dir))
+    fig.savefig('%s/CNN_LSTM_actual_pred_plot.png'%(results_dir))
     logging.info("Saved actual vs pred plot to disk")
     plt.close(fig)
 
@@ -191,7 +170,9 @@ def scatter_plot (y_actual: np.ndarray, y_pred: np.ndarray):
     fig.suptitle('Predicted Value Vs Actual Value')
     ax.set_ylabel('Predicted')
     ax.set_xlabel('Actual')
-    fig.savefig('%s/lstm_attention_scatter_plot.png'%(results_dir))
+    fig_file = '%s/cnn_lstm_scatter_plot.png'%(results_dir)
+    logging.info('Saving to fig file {}'.format(fig_file))
+    fig.savefig(fig_file)
     logging.info("Saved scatter plot to disk")
     plt.close(fig)
 
@@ -236,7 +217,9 @@ def evaluate_model (x_data: np.ndarray, yield_data: np.ndarray, dataset: str) ->
     
        
     # Save metrics
-    with open('%s/lstm_attention_metrics_%s.csv' %(results_dir, dataset), 'w', newline="") as csv_file:  
+    logging.info('Getting ready to save to file')
+    output_file = '%s/cnn_lstm_metrics_%s.csv' %(results_dir,dataset)
+    with open(output_file, 'w', newline="") as csv_file:  
         writer = csv.writer(csv_file)
         for key, value in metric_dict.items():
             writer.writerow([key, value])    
