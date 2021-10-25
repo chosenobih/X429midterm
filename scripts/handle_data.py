@@ -43,7 +43,7 @@ def clean_other_data(other_data: np.ndarray,cluster_id_data: np.ndarray) -> np.n
     Returns:
         np.ndarray: OneHotEncoded matrix
     """    
-    other_df = pd.DataFrame(other_data[:,[0,1]])
+    other_df = pd.DataFrame(other_data)
     other_df.columns = ['Maturity Group', 'Genotype ID', 'State', 'Year', 'Location']
     for col in ['Maturity Group', 'Genotype ID']:
         other_df[col] = other_df[col].astype(np.float32).astype(int)
