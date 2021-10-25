@@ -41,7 +41,7 @@ def clean_other_data(other_data: np.ndarray,cluster_id_data: np.ndarray) -> np.n
     """    
     other_df = pd.DataFrame(other_data)
     other_df.columns = ['Maturity Group', 'Genotype ID', 'State', 'Year', 'Location']
-    for col in ['Maturity Group', 'Genotype ID', 'Year' 'Location']:
+    for col in ['Maturity Group', 'Genotype ID', 'Year', 'Location']:
         other_df[col] = other_df[col].astype(np.float32).astype(int)
 
     other_df['Genotype ID'] -= 1 #to match indexing for cluster_id_data
