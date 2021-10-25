@@ -36,8 +36,12 @@ class EnsembleModel:
         final_results = np.array([model.predict(X_data,batch_size = batch_size) for model in self.ensemble])
         return final_results.mean(axis=0)
 
-
-
+    
+    def write_predictions(self,predictions, data_stage = 'test'):
+        predicted_yield = self.yield_scaler.inverse_transform(predictions)
+        
+        with open(f'{data_stage}_predictions.npy','wb') as writer:
+            np.save(writer,predicted_yield)
 
 
     def evaluate_ensemble(self,X_data,yield_data, batch_size, dataset):

@@ -4,18 +4,15 @@ Team X
 INFO 429/529 Midterm
 Fall 2021
 
-handle_data.py contains the methods to convert the standard competition datasets into a meaninful one for training with any mode. Offers utilities to save and split data as well
+test_handle_data.py contains the methods to convert the standard competition datasets into a meaninful one for training with any mode. Offers utilities to save and split data as well
 '''
 
 
 from typing import Tuple
 import numpy as np, pandas as pd
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
-from sklearn.model_selection import train_test_split
-import joblib
 
-
-def load_data(weather_path:str,other_path:str, cluster_id_path:str, yield_scaler_path:str) -> Tuple:
+def load_data(weather_path:str,other_path:str, cluster_id_path:str) -> Tuple:
     """
     Loads all relevant data for processing via inputted filenames as specified
 
@@ -23,12 +20,11 @@ def load_data(weather_path:str,other_path:str, cluster_id_path:str, yield_scaler
         weather_path (str): path to weather data
         other_path (str): path to other data
         cluster_id_path (str): path to clusterID data
-        yield_scaler_path (str): path to yield data
 
     Returns:
         Tuple: tuple of arrays where each array is loaded from each path (in order)
     """    
-    return np.load(weather_path), np.load(other_path), np.load(cluster_id_path), np.load(yield_path)
+    return np.load(weather_path), np.load(other_path), np.load(cluster_id_path)
 
 
 
@@ -82,7 +78,7 @@ def scale_weather_data(weather_data: np.ndarray) -> np.ndarray:
     return weather_data_scaled
 
 
-def combine_weather_other_data(scaled_weather_data: np.ndarray, other_data_1he: np.ndarray, data_path: str = '../data/', data_stage: str = 'test') -> np.ndarray:
+def combine_weather_other_data(scaled_weather_data: np.ndarray, other_data_1he: np.ndarray, data_path: str = '../data/', data_stage: str = 'TEST') -> np.ndarray:
     """
     Combines the weather and other data via numpy broadcasting and column stacking. Saves data if paths are provided. Returns combined data in a 3-D array
 
@@ -90,7 +86,7 @@ def combine_weather_other_data(scaled_weather_data: np.ndarray, other_data_1he: 
         scaled_weather_data (np.ndarray): 3-D scaled weather data
         other_data_1he (np.ndarray): 2-D one-hot encoded other data
         data_path (str, optional): Must be provided to save data. Defaults to '../data/'.
-        data_stage (str, optional): Must be provided to save data and acts as an identifier. Defaults to 'development'.
+        data_stage (str, optional): Must be provided to save data and acts as an identifier. Defaults to 'TEST'.
 
     Returns:
         np.ndarray: 3-D combined data array
@@ -106,25 +102,23 @@ def combine_weather_other_data(scaled_weather_data: np.ndarray, other_data_1he: 
     final_array = np.array(new_array)
     assert final_array.shape == desired_arr_shape
     if data_path:
-        filename = data_path + f'combined_weather_mgcluster_214_{data_stage}.npy'
+        filename = data_path +  f'{data_stage}/combined_{data_stage}.npy'
         with open(filename,'wb') as writer:
             np.save(writer,final_array)
     return final_array
 
 def main():
-    data_path = '../data/TEST/'
-    weather_path = data_path + 'inputs_weather_test.npy'
-    other_path = data_path + 'inputs_others_test.npy' 
-    cluster_path = data_path + 'clusterID_genotype.npy'
-   
+    data_path = '../data/'
+    weather_path = data_path + 'TEST/inputs_weather_test.npy'
+    other_path = data_path + 'TEST/inputs_others_test.npy' 
+    cluster_path = data_path + 'clusterID_genotype.npy'   
     paths_in_order = [weather_path,other_path,cluster_path] 
     weather_data, other_data, cluster_data = load_data(*paths_in_order) 
 
     encoded_other_data = clean_other_data(other_data,cluster_data)
     scaled_weather_data = scale_weather_data(weather_data)
-    combined_data = combine_weather_other_data(scaled_weather_data,encoded_other_data,data_path=data_path)
-    scaled_yield = scale_yield_data(yield_data, data_path=data_path)
-    split_data_into_training_and_validation(combined_data,scaled_yield)
+    _ = combine_weather_other_data(scaled_weather_data,encoded_other_data,data_path=data_path)
+
 
 
 if __name__ == '__main__':
