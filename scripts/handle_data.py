@@ -44,12 +44,14 @@ def clean_other_data(other_data: np.ndarray,cluster_id_data: np.ndarray) -> np.n
         np.ndarray: OneHotEncoded matrix
     """    
     other_df = pd.DataFrame(other_data[:,[0,1]])
-    other_df.columns = ['Maturity Group', 'Genotype ID']
-    for col in other_df.columns:
+    other_df.columns = ['Maturity Group', 'Genotype ID', 'State', 'Year', 'Location']
+    for col in ['Maturity Group', 'Genotype ID']:
         other_df[col] = other_df[col].astype(np.float32).astype(int)
     other_df['Genotype ID'] -= 1 #to match indexing for cluster_id_data
     cluster_id_mapper = lambda genotype_id: cluster_id_data[genotype_id]
+    state_cleaner = lambda state: ''.join([char for char in state if char.isalpha()])
     other_df['Genotype ID'] = other_df['Genotype ID'].apply(cluster_id_mapper)
+    other_df['State'] = other_df['State'].apply(state_cleaner)
     #now one hot encode all data 
     return OneHotEncoder().fit_transform(other_df).toarray().astype('float32')
 
@@ -135,7 +137,7 @@ def combine_weather_other_data(scaled_weather_data: np.ndarray, other_data_1he: 
     final_array = np.array(new_array)
     assert final_array.shape == desired_arr_shape
     if data_path:
-        filename = data_path + f'combined_weather_mgcluster_214_{data_stage}.npy'
+        filename = data_path + f'combined_weather_mgcluster_214_all_{data_stage}.npy'
         with open(filename,'wb') as writer:
             np.save(writer,final_array)
     return final_array
