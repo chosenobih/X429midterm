@@ -1,6 +1,8 @@
 #!/bin/bash
 
 #SBATCH --job-name=teamxmidtermtest
+#SBATCH -e ../logs/model_predict_errors.e
+#SBATCH -o ../logs/model_predict_output.o
 #SBATCH --partition=standard
 #SBATCH --nodes=1
 #SBATCH --ntasks=60
