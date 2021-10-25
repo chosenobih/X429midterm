@@ -41,7 +41,7 @@ def clean_other_data(other_data: np.ndarray,cluster_id_data: np.ndarray) -> np.n
     """    
     other_df = pd.DataFrame(other_data)
     other_df.columns = ['Maturity Group', 'Genotype ID', 'State', 'Year', 'Location']
-    for col in ['Maturity Group', 'Genotype ID']:
+    for col in ['Maturity Group', 'Genotype ID', 'Year' 'Location']:
         other_df[col] = other_df[col].astype(np.float32).astype(int)
 
     other_df['Genotype ID'] -= 1 #to match indexing for cluster_id_data
@@ -49,10 +49,18 @@ def clean_other_data(other_data: np.ndarray,cluster_id_data: np.ndarray) -> np.n
     state_cleaner = lambda state: ''.join([char for char in state if char.isalpha()])
     other_df['Genotype ID'] = other_df['Genotype ID'].apply(cluster_id_mapper)
     other_df['State'] = other_df['State'].apply(state_cleaner)
+
+    #PLEASE READ BELOW
+
+    #IN ORDER TO MAKE THE TEST SET MATCH THE FORMAT OF THE TRAIN SET, WE ARE GOING TO ADD AN EXTRA RECORD WITH THE MISSING LOCATION FROM THE 
+    # TRAINING SET
+    new_record = other_df.iloc[-1].copy()
+    new_record['Location'] = 162 #YES THIS HAS TO BE HARDCODED
+    other_df.loc['New'] = new_record
     #now one hot encode all data 
     one_hot_encoded_data = OneHotEncoder().fit_transform(other_df).toarray().astype('float32')
     assert one_hot_encoded_data.shape[1] == 230
-    return one_hot_encoded_data
+    return one_hot_encoded_data[:-1] #YEP THE LAST RECORD IS JUST THERE TO ADD A NEW LOCATION RECORD TO MAKE SURE THE OHE IS THE SAME
 
 
 
