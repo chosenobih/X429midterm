@@ -48,6 +48,5 @@ Technologies Learned:
 A few members of the team were very proficient in using HPC and navigating in the terminal, however, the rest of us had a steeper learning curve in this area. We also learned a lot from our team spokesperson, Ryan, on setting up a virtual environment and all the necessary moving pieces in getting a model up and running on the HPC. Additionally, we learned quite a bit about different models, namely ensemble models, when we were researching to improve our predictions
 
 Methodologies Learned:
-
-
+One of the methodologies our team explored was the use of an ensemble model set up, where we averaged multiple models to gain one good prediction from multiple lesser models. 
 
