@@ -12,7 +12,49 @@ Collaborators:
 Climates change effects are a growing concern for people around the world. Agricultural yield in recent years has been drastically affected by the frequent changing climatic conditions and thus, the need for improving current agricultural breeding programs. One way this can be achieved is through the use of machine learning algorithm for accurate prediction of various plant genotypes yield. For our midterm project, we utilized a Soybean dataset consisting of 103,365 performance records over 13 years and 150 locations with weekly weather data for each location throughout the growing season of 30 weeks. We trained various machine learning models to accurately predict yearly crop yield using the records provided. We found that the use of an ensemble model set up, where we averaged multiple models to gain one good prediction from multiple lesser models produced a better prediction.
 
 
-# Documentation
+## Getting Started
+In order to get started, you must set up a `data` directory. 
+
+First, make sure you have anaconda on your machine. Next, make a conda env using the `environment.yml` file with `conda env create -f environment.yml`. 
+If needed, activate the env with `conda activate info529midterm`. Once here, we can run the scripts to organize data.
+
+```bash
+data
+├── clusterID_genotype.npy
+├── inputs_others_train.npy
+├── inputs_weather_train.npy
+└── yield_train.npy
+```
+These are necessary for `handle_data.py` to work. This script will set up all other data for you.
+
+Final data dir structure:
+```
+data
+├── clusterID_genotype.npy
+├── combined_data_train.npy
+├── combined_data_validation.npy
+├── combined_weather_mgcluster_214_development.npy
+├── inputs_others_train.npy
+├── inputs_weather_train.npy
+├── scaled_yield_development.npy
+├── scaled_yield_train.npy
+├── scaled_yield_validation.npy
+└── yield_train.npy
+```
+
+As you can see, there is training data and validation data created for us. Also, we can run this script, minus the data splitting, to format our test data as well.
+Development data is the entire "training" set before it was split
+
+### Running existing model_train scripts
+
+If you have the environment set up on your machine, you can run the script like any other Python script. This is the same for if you are in an interactive session on the HPC.
+
+If you are trying to train the model through a slurm script, please run `sbatch model_train.script`. To see if it's running, I like to use `squeue -u [netID]`.
+
+Interested in writing your own script? That's okay - just make sure all your log files are pointed to a logs directory. 
+
+
+# Documentation / After Action Review
 
 
 ## Lessons Learned:
