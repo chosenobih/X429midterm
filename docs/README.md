@@ -9,7 +9,7 @@ Collaborators:
 - Jake Newton
 
 ## Introduction
-Climates change effects are a growing concern for people around the world. Agricultural yield in recent years has been drastically affected by the frequent changing climatic conditions and thus, the need for improving current agricultural breeding programs. One way this can be achieved is through the use of machine learning algorithm for accurate prediction of various plant genotypes yield. For our midterm project, we utilized a Soybean dataset consisting of 103,365 performance records over 13 years and 150 locations with weekly weather data for each location throughout the growing season of 30 weeks. We trained various  machine learning models to accurately predict yearly crop yield using the records provided. We found that the use of an ensemble model set up, where we averaged multiple models to gain one good prediction from multiple lesser models produced a better prediction.
+Climates change effects are a growing concern for people around the world. Agricultural yield in recent years has been drastically affected by the frequent changing climatic conditions and thus, the need for improving current agricultural breeding programs. One way this can be achieved is through the use of machine learning algorithm for accurate prediction of various plant genotypes yield. For our midterm project, we utilized a Soybean dataset consisting of 103,365 performance records over 13 years and 150 locations with weekly weather data for each location throughout the growing season of 30 weeks. We trained various machine learning models to accurately predict yearly crop yield using the records provided. We found that the use of an ensemble model set up, where we averaged multiple models to gain one good prediction from multiple lesser models produced a better prediction.
 
 
 # Documentation
@@ -53,3 +53,8 @@ As mentioned on the website, keeping in mind how our techniques and practices co
 
 Document your collaboration:
 Journaling progress towards the project goal is an important habit to benefit learning and understanding after project completion. This allows other groups or individuals to see the difficulties presented by the project and see the steps taken to solve those problems, and perhaps make different choices or understand the choices made. Luckily for us, Slack and GitHub track changes and commit messages to allow for easy retrospective analysis of our thought processes. We decided to opt towards a more data-driven approach in journaling, where commit messages and an after-action review are the primary means of documenting our difficulties and challenges.
+
+
+# Acknowledgements
+
+We would like to thank Emmanuel Gonzalez, Eric Lyons, and Nirav Merchant for guidance and direction in Machine Learning, High-Performance Computing, and Data Analysis for this project.
