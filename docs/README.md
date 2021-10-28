@@ -1,15 +1,28 @@
 # X429midterm
-ISTA429 Midterm project for Team X
+ISTA429/PLS 529 Midterm project for Team X
 
 Collaborators:
 - Ryan Papetti
 - Jordan Elliott
 - Nicholas Stout
 - Chosen Obih
-- Jake Newton 
+- Jake Newton
+
+## Introduction
+Climates change effects are a growing concern for people around the world. Agricultural yield in recent years has been drastically affected by the frequent changing climatic conditions and thus, the need for improving current agricultural breeding programs. One way this can be achieved is through the use of machine learning algorithm for accurate prediction of various plant genotypes yield. For our midterm project, we utilized a Soybean dataset consisting of 103,365 performance records over 13 years and 150 locations with weekly weather data for each location throughout the growing season of 30 weeks. We trained various  machine learning models to accurately predict yearly crop yield using the records provided. We found that the use of an ensemble model set up, where we averaged multiple models to gain one good prediction from multiple lesser models produced a better prediction.
 
 
 ## Documentation
+
+
+## Lessons Learned:
+At the start of this project, only 2 members of our team had much experience with building a machine learning algorithm. The main learning curve for the rest of us was understanding how the models functioned and which parameters to tweak during testing. Additionally, a few members of our team had a steep learning curve understanding using the HPC and how to configure the scripts and python files to run the code successfully. Overall, this project has boosted our team’s understanding of the start to finish process of designing a model, preparing the data, troubleshooting, and making adjustments.
+
+# Technologies Learned:
+A few members of the team were very proficient in using HPC and navigating in the terminal, however, the rest of us had a steeper learning curve in this area. We also learned a lot from our team spokesperson, Ryan, on setting up a virtual environment and all the necessary moving pieces in getting a model up and running on the HPC. Additionally, we learned quite a bit about different models, namely ensemble models, when we were researching to improve our predictions.
+
+# Methodologies Learned:
+One of the methodologies our team explored was the use of an ensemble model set up, where we averaged multiple models to gain one good prediction from multiple lesser models. 
 
 
 ## 10 Rules to Cultivate Transdisciplinary Collaboration in Data Science:
@@ -40,13 +53,3 @@ As mentioned on the website, keeping in mind how our techniques and practices co
 
 Document your collaboration:
 Journaling progress towards the project goal is an important habit to benefit learning and understanding after project completion. This allows other groups or individuals to see the difficulties presented by the project and see the steps taken to solve those problems, and perhaps make different choices or understand the choices made. Luckily for us, Slack and GitHub track changes and commit messages to allow for easy retrospective analysis of our thought processes. We decided to opt towards a more data-driven approach in journaling, where commit messages and an after-action review are the primary means of documenting our difficulties and challenges.
-
-Lessons Learned:
-At the start of this project, only 2 members of our team had much experience with building a machine learning algorithm. The main learning curve for the rest of us was understanding how the models functioned and which parameters to tweak during testing. Additionally, a few members of our team had a steep learning curve understanding using the HPC and how to configure the scripts and python files to run the code successfully. Overall, this project has boosted our team’s understanding of the start to finish process of designing a model, preparing the data, troubleshooting, and making adjustments.
-
-Technologies Learned:
-A few members of the team were very proficient in using HPC and navigating in the terminal, however, the rest of us had a steeper learning curve in this area. We also learned a lot from our team spokesperson, Ryan, on setting up a virtual environment and all the necessary moving pieces in getting a model up and running on the HPC. Additionally, we learned quite a bit about different models, namely ensemble models, when we were researching to improve our predictions
-
-Methodologies Learned:
-One of the methodologies our team explored was the use of an ensemble model set up, where we averaged multiple models to gain one good prediction from multiple lesser models. 
-
