@@ -12,20 +12,20 @@ Collaborators:
 Climates change effects are a growing concern for people around the world. Agricultural yield in recent years has been drastically affected by the frequent changing climatic conditions and thus, the need for improving current agricultural breeding programs. One way this can be achieved is through the use of machine learning algorithm for accurate prediction of various plant genotypes yield. For our midterm project, we utilized a Soybean dataset consisting of 103,365 performance records over 13 years and 150 locations with weekly weather data for each location throughout the growing season of 30 weeks. We trained various  machine learning models to accurately predict yearly crop yield using the records provided. We found that the use of an ensemble model set up, where we averaged multiple models to gain one good prediction from multiple lesser models produced a better prediction.
 
 
-## Documentation
+# Documentation
 
 
 ## Lessons Learned:
 At the start of this project, only 2 members of our team had much experience with building a machine learning algorithm. The main learning curve for the rest of us was understanding how the models functioned and which parameters to tweak during testing. Additionally, a few members of our team had a steep learning curve understanding using the HPC and how to configure the scripts and python files to run the code successfully. Overall, this project has boosted our team’s understanding of the start to finish process of designing a model, preparing the data, troubleshooting, and making adjustments.
 
-# Technologies Learned:
+## Technologies Learned:
 A few members of the team were very proficient in using HPC and navigating in the terminal, however, the rest of us had a steeper learning curve in this area. We also learned a lot from our team spokesperson, Ryan, on setting up a virtual environment and all the necessary moving pieces in getting a model up and running on the HPC. Additionally, we learned quite a bit about different models, namely ensemble models, when we were researching to improve our predictions.
 
-# Methodologies Learned:
+## Methodologies Learned:
 One of the methodologies our team explored was the use of an ensemble model set up, where we averaged multiple models to gain one good prediction from multiple lesser models. 
 
 
-## 10 Rules to Cultivate Transdisciplinary Collaboration in Data Science:
+# 10 Rules to Cultivate Transdisciplinary Collaboration in Data Science:
 
 Develop Reflexive Habits:
 Developing good reflexive habits are integral to working on an interdisciplinary team to understand each other and stay on the same page. This can be accomplished through regular communication and exposure to other disciplines and the way they operate so that you can learn the technical language and understand how to communicate and facilitate collaboration. On our team, we had a fairly wide array of backgrounds, which meant at the beginning everyone assumed different roles to fill a need. As a result of this, I think our team had a good opportunity to develop good reflexive habits since we were all learning from each other throughout the project. Additionally, since we had to quickly assemble a team and work together, I think we all asked questions early on to get on the same page, so we understood the midterm assignment and our individual roles.
