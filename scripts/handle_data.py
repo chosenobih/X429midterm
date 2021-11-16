@@ -15,8 +15,8 @@ from sklearn.model_selection import train_test_split
 import joblib, logging
 
 
-logging.basicConfig(filename='../logs/data_handling.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
-
+# logging.basicConfig(filename='../logs/data_handling.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
+logging.basicConfig( level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def load_data(weather_path:str,other_path:str, cluster_id_path:str, yield_path:str) -> Tuple:
     """

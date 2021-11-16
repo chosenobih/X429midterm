@@ -4,7 +4,8 @@ from keras.models import load_model
 
 from ensemble_evaluation import EnsembleModel
 
-logging.basicConfig(filename='../logs/test_model_predictions.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
+# logging.basicConfig(filename='../logs/test_model_predictions.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
+logging.basicConfig( level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 allow_pickle_flag = True
 

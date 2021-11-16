@@ -15,7 +15,8 @@ config.gpu_options.allow_growth = True
 sess = tf.compat.v1.Session(config=config)
 sess.as_default()
 
-logging.basicConfig(filename='../logs/cnn_lstm_model_train.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
+# logging.basicConfig(filename='../logs/cnn_lstm_model_train.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
+logging.basicConfig( level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 allow_pickle_flag = True
 

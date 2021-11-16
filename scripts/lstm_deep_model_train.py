@@ -9,8 +9,8 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from keras.optimizers import Adam
 from math import sqrt
 
-logging.basicConfig(filename='../logs/GRU_model_train.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
-
+# logging.basicConfig(filename='../logs/GRU_model_train.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
+logging.basicConfig( level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 allow_pickle_flag = True
 
 TRAIN_DATA = np.load('../data/combined_data_train.npy', allow_pickle=allow_pickle_flag)

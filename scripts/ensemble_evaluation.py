@@ -4,7 +4,8 @@ from keras.models import Model, load_model
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from math import sqrt
 
-logging.basicConfig(filename='../logs/ensemble_evaluation.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
+# logging.basicConfig(filename='../logs/ensemble_evaluation.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
+logging.basicConfig( level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 allow_pickle_flag = True
 
