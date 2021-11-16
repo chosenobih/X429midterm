@@ -1,2 +1,5 @@
 .git
 results/*.png
+data/
+logs/
+recent_model/

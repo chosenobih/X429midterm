@@ -5,6 +5,10 @@ echo "Beginning ensemble training"
 
 echo $CONDA_DEFAULT_ENV
 
+ls -l ../..
+
+ls -l /analysis
+
 python model_train.py
 python lstm_model_train.py
 python lstm_deep_model_train.py

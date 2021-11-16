@@ -3,6 +3,8 @@ FROM continuumio/miniconda3
 
 WORKDIR /analysis
 
+
+
 # Make RUN commands use `bash --login`:
 SHELL ["/bin/bash", "--login", "-c"]
 
@@ -13,11 +15,12 @@ RUN conda env create -f environment.yml
 
 # Initialize conda in bash config fiiles:
 RUN conda init bash
+# VOLUME "data"
 
 # Activate the environment, and make sure it's activated:
 RUN echo "conda activate info529midterm" > ~/.bashrc
 RUN echo "Make sure joblib is installed:"
-RUN python -c "import joblib; print('joblib imported')"
+RUN python -c "import joblib; print('joblib imported nice')"
 
 RUN echo "Beginning to add relevant directories to container"
 
@@ -32,4 +35,6 @@ RUN chmod +x ensemble_train_bash_dev.sh
 
 
 RUN echo "Beginning Ensemble Below"
-ENTRYPOINT ["/analysis/scripts/ensemble_train_bash_dev.sh"]
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "info529midterm", "/analysis/scripts/ensemble_train_bash_dev.sh"]
+
+# ENTRYPOINT ["/analysis/scripts/ensemble_train_bash_dev.sh"]
