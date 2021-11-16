@@ -16,8 +16,8 @@ RUN conda init bash
 
 # Activate the environment, and make sure it's activated:
 RUN echo "conda activate info529midterm" > ~/.bashrc
-RUN echo "Make sure numpy is installed:"
-RUN python -c "import numpy as np; print(np.mean([20,30]))"
+RUN echo "Make sure joblib is installed:"
+RUN python -c "import joblib; print('joblib imported')"
 
 RUN echo "Beginning to add relevant directories to container"
 
