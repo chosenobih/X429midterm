@@ -1,10 +1,9 @@
 import os, logging, joblib, csv, numpy as np, matplotlib.pyplot as plt, pandas as pd
-from typing import Dict, Tuple
-from keras.layers import Concatenate, Dot, Input, LSTM, Dense, Conv1D
-from keras.layers import Dropout, Flatten, Activation
+from typing import Dict
+from keras.layers import  LSTM, Dense, Conv1D
+from keras.layers import Dropout
 from keras.models import Model, Sequential
 from keras.callbacks import EarlyStopping
-from keras.activations import softmax
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from keras.optimizers import Adam
 from math import sqrt
@@ -16,7 +15,8 @@ config.gpu_options.allow_growth = True
 sess = tf.compat.v1.Session(config=config)
 sess.as_default()
 
-logging.basicConfig(filename='../logs/cnn_lstm_model_train.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
+# logging.basicConfig(filename='../logs/cnn_lstm_model_train.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', filemode='w')
+logging.basicConfig( level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 allow_pickle_flag = True
 
@@ -35,26 +35,12 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 
 ### CHANGE THESE BELOW FOR MESSING WITH MODEL
  
-h_s = 256   # {32, 64, 96, 128, 256}
-dropout = 0.4  # {0.05, 0.1, 0.2, 0.4, 0.4, 0.5}
+h_s = 128   # {32, 64, 96, 128, 256}
+dropout = 0.25  # {0.05, 0.1, 0.2, 0.4, 0.4, 0.5}
 batch_size = 512 # paper said this didn't matter much. Dont change  
 epochs = 50   # Try not to go above 50 - it will stop when it starts to overfit
 lr_rate = 0.001   # (0.001, 3e-4, 5e-4)
 ### DO NOT CHANGE BELOW
-
-# Model
-t_densor = Dense(1, activation = "relu")
-
-# Softmax
-def softMaxLayer(x):
-    return softmax(x, axis=1)   # Use axis = 1 for attention
-
-activator = Activation(softMaxLayer)
-dotor = Dot(axes = 1)
-concatenator = Concatenate(axis=-1)
-flatten = Flatten()
-
-
 
 def model(Tx: int, var_ts: int, h_s: int, dropout: float) -> Model:
     """[summary]
@@ -75,10 +61,10 @@ def model(Tx: int, var_ts: int, h_s: int, dropout: float) -> Model:
 
     dropout_layer = Dropout(dropout)
 
-    first_conv_layer = Conv1D(filters=64, kernel_size=5,strides=1, padding="causal",activation="relu",input_shape=(Tx, var_ts))
+    first_conv_layer = Conv1D(filters=16, kernel_size=5, strides=4, padding="causal",activation="relu",input_shape=(Tx, var_ts))
 
     first_lstm_layer = LSTM(h_s, return_sequences=True)
-    second_lstm_layer = LSTM(int(3/5 * h_s), return_sequences=False)
+    second_lstm_layer = LSTM(int(2/5 * h_s), return_sequences=False)
 
     output_layer = Dense(1)
     pred_model = Sequential([first_conv_layer,first_lstm_layer, dropout_layer, second_lstm_layer,output_layer])
