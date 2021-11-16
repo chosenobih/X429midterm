@@ -9,6 +9,9 @@ Collaborators:
 - Jake Newton 
 
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jake-newton/X429midterm.git/HEAD?labpath=scripts%2Frun_scripts.ipynb)
+
+
 ## Getting Started
 In order to get started, you must set up a `data` directory. 
 
