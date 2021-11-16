@@ -5,9 +5,7 @@ echo "Beginning ensemble training"
 
 echo $CONDA_DEFAULT_ENV
 
-ls -l ../..
-
-ls -l /analysis
+pwd
 
 cd ../data
 
